@@ -1,9 +1,10 @@
 (ns comp.loader
-  (:require [reagent.core :as reagent]
-            [goog.net.jsloader :as jsl]
-            [goog.html.legacyconversions :as conv]
-            [cljs.core]
-            ))
+  (:require 
+   [reagent.core :as r]
+   [goog.net.jsloader :as jsl]
+   [goog.html.legacyconversions :as conv]
+   [cljs.core]
+   ))
 
 
 (defn filter-loaded [scripts]
@@ -21,8 +22,8 @@
              :loading component
              :loaded component}"
   [{:keys [scripts loading loaded]}]
-  (let [loaded? (reagent/atom false)]
-    (reagent/create-class
+  (let [loaded? (r/atom false)]
+    (r/create-class
      {:component-did-mount
         (fn [_]
          (let [not-loaded (clj->js (filter-loaded scripts))]
@@ -32,13 +33,3 @@
       :reagent-render
         (fn [{:keys [scripts loading loaded]}]
            (if @loaded? loaded loading))})))
-
-(comment
-
-  (comp.loader/filter-loaded {
-    #(exists? js/Stripe) "https://js.stripe.com/v2/"
-    ;(exists? js/TradingView) "/charting_library.min.js"
-  })
-
-
-  )

@@ -1,101 +1,113 @@
 (ns tradingview.chart
   (:require
-    [reagent.core :as r]
-    [comp.loader]
-    [api.my-host :refer [dev?]])
-)
-
-(def config-demo
-  {:data "https://demo_feed.tradingview.com"
-   :storage "https://saveload.tradingview.com";
-  })
-
-(def config-dev
-  {:data "http://localhost:5005/api/tradingview"
-   :storage "http://localhost:5005/api/tradingviewstorage";
-  })
-
-(def config-dev-rt
-  {:data "http://localhost:5005/api/tradingviewrt"
-   :storage "http://localhost:5005/api/tradingviewstorage";
-  })
+   [clojure.string]
+   [reagent.core :as r]
+   [cljs-uuid-utils.core :as uuid]
+   ["tradingview-lib" :as tv]
+   ["tradingview-udf" :refer [UDFCompatibleDatafeed]]
+   ;[comp.loader]
+   ))
 
 
-(def config-prod
-  {:data "https://quant.hoertlehner.com/api/tradingview"
-   :storage "https://quant.hoertlehner.com/api/tradingviewstorage";
-  })
+(defn create-feed! [feed-url]
+  (println "Creating UDF Feed: " feed-url)
+  (when (nil? UDFCompatibleDatafeed)
+    (println "Error: UDF function is nil."))
+  (UDFCompatibleDatafeed. feed-url))
 
 
-(def config
-  (if (dev?)
-      config-dev-rt ; use dev when no hostname is being returned.
-      config-prod))
+(defn init-tradingview! [id feed-url storage-url]
+  (let [data-feed (create-feed! feed-url)
+        options {:debug true ; false
+                 :symbol "DAX Index"
+                 :datafeed data-feed
+                 :interval "D"
+                 :container_id id ;  ID of the surrounding div
+                 :library_path "/tradingview/charting_library/"
+                 :locale "en" ; getLanguageFromURL() || 'en',
+                 :disabled_features [] ;  'use_localstorage_for_settings']
+                 :enabled_features ['study_templates']
+                 :charts_storage_url storage-url ; "https://saveload.tradingview.com",
+                 :charts_storage_api_version "1.1"
+                 :client_id 1 ; "tradingview.com"
+                 :user_id 1 ; "public_user_id"
+			           ;width: 200,
+			           ;height: 200,
+                 :fullscreen false ; // all window
+                 :autosize true ; all space in container
+
+                 :studies_overrides {}
+			;overrides: {
+			; "mainSeriesProperties.showCountdown": true,
+			;	"paneProperties.background": "#131722",
+			;	"paneProperties.vertGridProperties.color": "#363c4e",
+		  ;		"paneProperties.horzGridProperties.color": "#363c4e",
+		  ;		"symbolWatermarkProperties.transparency": 90,
+		  ;		"scalesProperties.textColor" : "#AAA",
+		  ;		"mainSeriesProperties.candleStyle.wickUpColor": '#336854',
+		  ;		"mainSeriesProperties.candleStyle.wickDownColor": '#7f323f'
+		 ; 	}
+                 }
+        options-js (clj->js options {:keyword-fn name})
+        _ (.log js/console options-js)]
+    (tv/widget. options-js)))
+
+
+(defn shutdown-tradingview! [tv]
+  (println "shutting down tradingview ..")
+  (if (nil? tv)
+    (println "tv is nil. Not calling shutdown.")
+    (.remove tv/widget)))
 
 
 
-(def chart-props {
-    :containerId "tradingview_container"
-  })
 
-(defn space-to-underscore [str]
+(defn symbol->tradingview [str]
   (if (nil? str) str
       (clojure.string/replace str " " "_")))
 
 
-(defn init-chart [symbol]
-  (println "TradingViewChart.Init: " symbol)
-  (js/window.MyTradingView.initChart (:containerId chart-props) (:data config) (:storage config) (space-to-underscore symbol))
-   )
-
-(defn set-symbol [symbol]
+(defn set-symbol! [tv]
   (println "TradingViewChart.ChangeSymbol: " symbol)
-  (.setSymbol js/window.MyTradingView (space-to-underscore symbol) "D"))
+  (.setSymbol tv (symbol->tradingview symbol) "D"))
 
-(defn remove-chart []
-  (println "TradingViewChart.Init: " symbol)
-  (js/window.MyTradingView.removeChart)
-   )
+(defn tradingview-chart [{:keys [feed-url storage-url]}]
+  (let [id  (uuid/uuid-string (uuid/make-random-uuid))
+        tv (r/atom nil)
+        ;state (r/atom {})
+        ]
+    (r/create-class
+     {:display-name  "tradingview"
 
+      :reagent-render
+      (fn [_]
+        [:div {:id id :style {:width "100%" :height "100%"}}])
 
-(defn chart [symbol]
-  (let [state (r/atom {})] ;; you can include state
-    (r/create-class {
-      :display-name  "tradingviewWrapper"      ;; for more helpful warnings & errors
-      :reagent-render ;; let it re-render when the arguments change
-        (fn [symbol]
-           [:div {:id (:containerId chart-props) }]) ;; let it re-render when the arguments change
-      :component-did-mount (fn [this]
-         (println "TradingViewChart.ComponentDidMount")
-         (init-chart symbol)) ;;component is mounted into the DOM
-      ; :component-did-mount (fn [comp]  (.log js/console "ComponentDidMount")
+      :component-did-mount (fn [_]
+                             (println "TradingViewChart.ComponentDidMount")
+                             (reset! tv (init-tradingview! id feed-url storage-url))
+                             (.onChartReady @tv #(println "TradingView ChartWidget has loaded!")))
 
-     ;:component-will-receive-props  (fn [this]
-    ;   (let [ [_ s] (r/argv this)]
-    ;    (.log js/console "CompWillReceiveProps: " s)
-    ;    (set-symbol s)
-    ;    ))
-    :component-did-unmount (fn [this]
-      (println "TradingViewChart.ComponentDid-UN-Mount")
-      (remove-chart))
+      :component-will-unmount (fn [this]
+                                (println "TradingViewChart.ComponentDid-UN-Mount")
+                                (shutdown-tradingview! @tv))
 
-     :component-did-update  ;;called just after re-rendering.
-      (fn [this]
-         (let [[_ s] (r/argv this) ]
-           (.log js/console "TradingViewChart.ComponentDidUpdate " s)
-           (set-symbol s)
-           ))
-})))
+      :component-will-receive-props (fn [this new-argv]
+                                      (println "receive props: " new-argv))
+
+      :component-did-update (fn [this [_ prev-props prev-more]]
+                              (let [s (r/argv this)]
+                                (println "TradingViewChart.ComponentDidUpdate " s)
+          ;(set-symbol s)
+                                ))})))
 
 
-;(defn chart-with-js []
-;  [comp.loader/js-loader {
-;    :scripts {
-;      #(exists? js/Stripe) "https://js.stripe.com/v2/"
-;      #(exists? js/TradingView) "/charting_library.min.js"
-;    }
-;    :loading [:h1 "Loading Scripts..."]
-;    :loaded [:h1 "Loaded Finished!"]
-;    ;[chart]
-;    }]
-;  )
+#_(defn tradingview-chart []
+    [comp.loader/js-loader
+     {:scripts {#(exists? js/Datafeeds) "/tradingview/UDF/bundle.js"
+                #(exists? js/TradingView) "/tradingview/charting_library.min.js"
+                #(exists? js/klipse) "https://storage.googleapis.com/app.klipse.tech/plugin/js/klipse_plugin.js"}
+      :loading [:h1 "Loading Scripts..."]
+      :loaded [:h1 "loaded!"]
+    ;[chart]
+      }])

@@ -1,11 +1,8 @@
 (ns tradingview.impl.search
   (:require
    [clojure.set]
-   [monger.core :as mg]
-   [monger.collection :as mc]
    [monger.joda-time]
-   [monger.query :refer [with-collection paginate fields find sort]]
-
+   [monger.query :as mq :refer [with-collection paginate fields]]
    [tradingview.impl.symbol :refer [tradingview-symbol-info]]))
 
 
@@ -18,10 +15,10 @@
     ;(mc/find-maps db "instruments" query
     ;; find top 10 scores
     (with-collection db "instruments"
-      (find query)
-      ;(fields [:symbol :name :exchange :category]) ;
+      (mq/find query)
+      ;(fields [:symbol :name :exchange :category]) ;sort
       (fields {:symbol-only 1 :symbol 1 :name 1 :exchange 1 :category 1 :_id 0})
-      (sort {:name 1})
+      (mq/sort {:name 1})
       (paginate :page 1 :per-page limit))))
 
 

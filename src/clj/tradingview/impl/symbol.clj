@@ -4,11 +4,8 @@
    [clojure.set]
    [clj-time.core :as t]
    [clj-time.coerce :as c]
-
-   [monger.core :as mg]
    [monger.collection :as mc]
-   [monger.joda-time]
-   [monger.query :refer [with-collection paginate fields find sort]]))
+   [monger.joda-time]))
 
 
 
@@ -75,7 +72,7 @@
   (let [c (categorize-symbol (:symbol instrument)) ;  {:symbol-only "AIF-U", :exchange "CN", :category "Equity"}
         exchange (nil-default (:exchange c) "AV")
         ticker (:symbol instrument); (space-to-underscore (:symbol instrument))
-        display (:symbol-only c)
+        ; display (:symbol-only c)
         display (space-to-underscore (:symbol instrument))
         tradingview  (str exchange ":" (space-to-underscore (:symbol instrument)))
         ;symbol-tradingview

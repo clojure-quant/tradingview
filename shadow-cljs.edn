@@ -1,7 +1,7 @@
 { :lein   {:profile "+cljs,+demo"}
  
  ;shadow dev http server settings
- :dev-http {8000 {:handler demo/routes
+ :dev-http {8000 {:handler demo.routes/routes
                   :roots ["dev" 
                           "target/cljs" 
                           "classpath:public" 

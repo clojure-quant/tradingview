@@ -50,20 +50,7 @@
   ; Views
   (GET "/approuter" [] (my-views/app-router-page)) ; reagent apps
 
-  web.routes.tradingview/routes-redirect-history
-  web.routes.tradingview/routes-redirect-other
 
-  ; Api
-  (sweet/api
-     {:swagger
-       {:ui   "/docs"
-        :spec "/swagger.json"
-        :data {:info {:title "clojureQuant"}
-               :tags [
-                  {:name "tradingview" :description "tradingview.com chart api"}
-              ]}}}
-     web.routes.tradingview/add-routes
-  )
 
   (route/not-found "<h1> Sorry! Page not found.</h1>")
 

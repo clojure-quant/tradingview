@@ -74,7 +74,7 @@
        ;(dissoc x :_id) ; dont give back the mongo-db-id (this fucks up json serialization)
      (:series x)
      (sanitize-series x)))
-  ([db symbol start end]
+  ([db symbol _ start end] ; todo: frequency conversion not implemented
    (as-> {:symbol symbol} x
      (mc/find-one-as-map db "series" x)
        ;(dissoc x :_id) ; dont give back the mongo-db-id (this fucks up json serialization)

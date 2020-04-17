@@ -85,8 +85,6 @@
     (web.server/start-jetty web.app/app 5005)
     (web.server/stop-jetty)
 
-
-
     (clojure-version)
 
 )

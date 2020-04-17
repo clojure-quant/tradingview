@@ -5,7 +5,7 @@
   "TradingView Templates"
   (config [this])
   
-  (search [this query type  exchange limit])
+  (search [this query type exchange limit])
   (symbol-info [this symbol])
   
   (load-series [this symbol resolution from to])

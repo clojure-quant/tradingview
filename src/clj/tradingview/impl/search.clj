@@ -1,12 +1,12 @@
 (ns tradingview.impl.search
   (:require
+   [clojure.set]
    [monger.core :as mg]
    [monger.collection :as mc]
    [monger.joda-time]
    [monger.query :refer [with-collection paginate fields find sort]]
-   
- [tradingview.impl.symbol :refer [tradingview-symbol-info]]
-   ))
+
+   [tradingview.impl.symbol :refer [tradingview-symbol-info]]))
 
 
 (defn search-instrument [db query category exchange limit]
@@ -49,16 +49,11 @@
   (map search-conversion rows))
 
 
-
-
-(defn tradingview-search-request
+(defn search
   "searches by name/symbol, gives list of symbols"
   [db query type exchange limit]
-  (-> query
-      (search-instrument db (if-empty-default-value- type "")  (if-empty-default-value- exchange "") limit)
+  (-> (search-instrument db query (if-empty-default-value- type "")  (if-empty-default-value- exchange "") limit)
       (convert-search-)))
 
 
-(comment
-    ; SEARCH endpoints
-  (search "C" "Index" "" 2))
+

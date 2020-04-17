@@ -3,19 +3,8 @@
    [clj-time.core :as t]
    [clj-time.coerce :as c]
    [clj-time.format :as fmt]
-    ;[mongo.instrument :refer [load-symbol search-instrument]]
-
-  [tradingview.mongo.series :refer [available-range load-series ]]
-   ))
-
-; date conversion
-
-(defn to-date- [epoch-no-ms]
-  (c/from-long (* epoch-no-ms 1000)))
-
-(defn to-epoch-no-ms- [date]
-  (int (/ (c/to-long date) 1000)))
-
+   [tradingview.impl.time :refer [to-epoch-no-ms to-date]]
+   [tradingview.mongo.series :refer [available-range load-series]]))
 
 
 ; history
@@ -29,21 +18,20 @@
 (defn field-or-default [field bar default]
   (let [v (field bar)]
     (if (nil? v)
-       default
-       v)))
+      default
+      v)))
 
 (defn add-bar- [result bar]
   (let [c (:close bar)]
-      {:t (conj (:t result) (to-epoch-no-ms- (:date bar)))
-       :o (conj (:o result) (field-or-default :open bar c))
-       :h (conj (:h result) (field-or-default :high bar c))
-       :l (conj (:l result) (field-or-default :low bar c))
-       :c (conj (:c result) c)
-       :v (conj (:v result) (field-or-default :volume bar c))
-      }))
+    {:t (conj (:t result) (to-epoch-no-ms (:date bar)))
+     :o (conj (:o result) (field-or-default :open bar c))
+     :h (conj (:h result) (field-or-default :high bar c))
+     :l (conj (:l result) (field-or-default :low bar c))
+     :c (conj (:c result) c)
+     :v (conj (:v result) (field-or-default :volume bar c))}))
 
 (defn convert-bars [series]
-   (reduce add-bar- empty-result- series))
+  (reduce add-bar- empty-result- series))
 
 
 ; nextTime is the time of the closest available bar in the past.
@@ -73,38 +61,36 @@
 
 (defn interval [resolution]
   (case resolution
-        "D"  :daily
-        "1D" :daily
-        "M"  :monthly
-        "1M" :monthly
-        ))
+    "D"  :daily
+    "1D" :daily
+    "M"  :monthly
+    "1M" :monthly))
 
 
 (def yyyyMMdd-
-    (fmt/formatter "yyyy-MM-dd"))
+  (fmt/formatter "yyyy-MM-dd"))
 
 (defn dt2str [epoch]
   (fmt/unparse yyyyMMdd- epoch))
 
 
 (defn no-data [db-end-date]
-   {:s "no_data"
+  {:s "no_data"
     ;:t [] :o [] :h [] :l [] :c [] :v []
     ; :nextTime  (to-epoch-no-ms- db-end-date)
-      })
+   })
 
 
-(defn tradingview-history [symbol resolution from to]
-  (let [dt-from (to-date- from)
-        dt-to (to-date- to)
+(defn tradingview-series [db symbol resolution from to]
+  (let [dt-from (to-date from)
+        dt-to (to-date to)
         frequency (interval resolution)
-        db-data (available-range symbol)
+        db-data (available-range db symbol)
         _ (println "tradingview-history " symbol frequency (dt2str dt-from) "-" (dt2str dt-to))
-        series (load-series symbol frequency dt-from dt-to)
-        ]
+        series (load-series db symbol frequency dt-from dt-to)]
     (if (= 0 (count series))
-        (no-data (:end db-data))
-        (series-result- series))))
+      (no-data (:end db-data))
+      (series-result- series))))
 
 
 
@@ -132,13 +118,13 @@
   (to-epoch-no-ms- (t/now))
   (to-epoch-no-ms- (-> 14 t/days t/ago))
   (type (to-date- 1487289600))
-   (type (t/date-time 2010 10 3))
+  (type (t/date-time 2010 10 3))
 
   (epoch2str 1487289600)
   (c/from-long 1487289600000)
 
   (println yyyyMMdd-)
-(fmt/unparse yyyyMMdd- (t/date-time 2010 10 3))
+  (fmt/unparse yyyyMMdd- (t/date-time 2010 10 3))
 
   ; HISTORY endpoint
   ;https://demo_feed.tradingview.com/history?symbol=AAPL&resolution=D&from=1567457308&to=1568321308
@@ -147,6 +133,4 @@
 
   (server-time)
 
-  (interval "D")
-
-)
+  (interval "D"))

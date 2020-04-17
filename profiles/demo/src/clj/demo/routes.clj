@@ -1,9 +1,11 @@
-(ns demo
+(ns demo.routes
   (:require
-   [tradingview.impl.core :refer [tradingview-config!]]
+   [demo.config :refer [tradingview-config!]]
    [tradingview.routes :refer [create-tradingview-routes!]]))
 
 
-(let [tv (tradingview-config!)]
+(let [c (tradingview-config!)
+      tv (:tradingview c)
+      ]
   (def routes
     (create-tradingview-routes! tv)))

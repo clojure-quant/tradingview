@@ -7,7 +7,7 @@
                                      :sign-releases false}]]
 
   :min-lein-version "2.9.1"
-  
+
   :plugins [[lein-shell "0.5.0"]
             [lein-ancient "0.6.15"]]
 
@@ -25,10 +25,9 @@
   :test-paths ["test"]
   :resource-paths  ["resources"]
     ; :main ^:skip-aot app.main
-  
+
   :dependencies
-  [
-   [org.clojure/clojure "1.10.0"]
+  [[org.clojure/clojure "1.10.0"]
    [org.clojure/core.async "0.4.474" :exclusions [org.clojure/tools.reader]]
    [clj-http "3.10.0"]  ; http requests
    ;[json-html "0.4.7"]
@@ -36,25 +35,35 @@
 
 
   :profiles {:uberjar {:aot :all}  ; UberJar contains code plus resources  ; jar contains only code
-             
+
              :demo {:source-paths ["profiles/demo/src/cljs"
                                    "profiles/demo/src/clj"]
                     :dependencies  [[thheller/shadow-cljs "2.8.80"]
                                     [thheller/shadow-cljsjs "0.0.21"]
 
-; Database
-                                    [com.novemberain/monger "3.5.0" :exclusions [com.google.guava/guava]] ; mongod OLD 3.1.0            
+                                    [com.novemberain/monger "3.5.0" :exclusions [com.google.guava/guava]]
                                     [clj-commons/clj-ssh "0.5.15"]  ; SSH Tunnel
-                                    
+
+                                                  ; Web Server
+                                    [ring "1.7.0"]
+                                    [ring/ring-core "1.7.0"]
+                                    [ring/ring-devel "1.7.0"]
+                                    [ring/ring-jetty-adapter "1.7.0"]          ; needs to match compojure version
+                                    [ring/ring-defaults "0.3.2"]
+                                    [ring/ring-codec "1.1.1"]
+                                    [ring-cors "0.1.12"]                       ; CORS requests
+                                    [compojure "1.6.1"]                        ; Server-Side Routing
+                                    [metosin/compojure-api "1.1.10"]
+                                    [hiccup "1.0.5"]                           ; Templating Server/Side
+                                    [cheshire "5.8.0"]                         ; JSON encoding
+                                    [amalloy/ring-gzip-middleware "0.1.4"]     ; gzip compress responses
+                                    [com.cemerick/url "0.1.1"]
+
                                     ; CSV parsing
                                     [org.clojure/data.csv "0.1.4"]
                                     [org.clojure/data.xml "0.0.7"]
 
-                                    [compojure "1.6.1"]                        ; Server-Side Routing
-                                    [metosin/compojure-api "1.1.10"]
-                                    ; [hiccup "1.0.5"]                           ; Templating Server/Side
-                                    [cheshire "5.8.0"]                         ; JSON encoding
-                                    
+                                 
                                                   ;; LOGGING DEPS
                                     [org.clojure/tools.logging "0.2.4"]
                                     ;[org.slf4j/slf4j-log4j12 "1.7.1"]
@@ -68,7 +77,7 @@
 
              :cljs {:source-paths ["src/cljs"]
                     :dependencies [[thheller/shadow-cljs "2.8.80"]
-                                    [thheller/shadow-cljsjs "0.0.21"]
+                                   [thheller/shadow-cljsjs "0.0.21"]
                                    [org.clojure/clojurescript "1.10.597"
                                     :scope "provided"
                                     :exclusions [com.google.javascript/closure-compiler-unshaded
@@ -156,7 +165,7 @@
 
             ;"test-clj" ^{:doc "Run Unit Tests. "}
             ; ["with-profile" "+demo,+dev" "test"]
-            
+
             ;"test-js" ^{:doc "Run Unit Tests. Will compile bundle first."}
             ;["do" "build-test" ["test-run"]]
 

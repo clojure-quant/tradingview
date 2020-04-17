@@ -9,8 +9,8 @@
    [compojure.api.sweet :as sweet]
   ; [cheshire.core :refer :all]
   ; [cemerick.url :refer (url url-encode map->query)]
-    ;[import.series :refer [daily-series-latest]]
-    [tradingview.impl.time :refer [server-time]]
+   [tradingview.impl.time :refer [server-time]]
+   [tradingview.middleware :refer [wrap-middleware]]
    ))
 
 (s/defschema Chart
@@ -44,7 +44,7 @@
 
 
 (defn routes-storage [tv]
-  (sweet/context "/tradingviewstorage" [] :tags ["tradingview"]
+  (sweet/context "/tradingviewstorage" [] :tags ["storage"]
 
         ; storage
     (sweet/GET "/1.1/charts" []
@@ -90,49 +90,47 @@
       (ok (do (.delete-template tv client user template) {:status "ok"})))))
 
 
-(defn add-routes [tv]
-  (sweet/context "/api" [] :tags ["tradingview"]
+(defn routes-data [tv]
+  (sweet/context "/tradingview" [] :tags ["data"]
 
-    (sweet/context "/tradingview" [] :tags ["tradingview"]
-        ;  (GET "/timeseries" [symbol] (generate-string (map #(dissoc % :date) (stats/get-transformed-series mongo/db  symbol))))
-        ; https://demo_feed.tradingview.com/history?symbol=AAPL&resolution=D&from=1567457308&to=1568321308
+    (sweet/GET "/config" []
+      :query-params []
+      (ok (.config tv)))
 
-      (sweet/GET "/config" []
-        :query-params []
-        (ok (.config tv)))
+    (sweet/GET "/time" []
+      :query-params []
+      :return Long
+      (ok (server-time)))
 
-      (sweet/GET "/time" []
-        :query-params []
-        :return Long
-        (ok (server-time)))
+    (sweet/GET "/search" []
+      :query-params [query :- String
+                     type :- String
+                     exchange :- String
+                     limit :- Long]
+      (ok (.search tv query type exchange limit)))
 
-      (sweet/GET "/search" []
-        :query-params [query :- String
-                       type :- String
-                       exchange :- String
-                       limit :- Long]
-        (ok (.search tv query type exchange limit)))
+    (sweet/GET "/symbols" []
+      :query-params [symbol :- String]
+      (ok (.symbol-info tv symbol)))
 
-      (sweet/GET "/symbols" []
-        :query-params [symbol :- String]
-        (ok (.search tv symbol)))
-
-      (sweet/GET "/history" []
-        :query-params [symbol :- String resolution from :- Long to :- Long]
-        (ok (.load-series tv symbol resolution from to)))
-
-      (routes-storage tv))))
+      ; https://demo_feed.tradingview.com/history?symbol=AAPL&resolution=D&from=1567457308&to=1568321308
+    (sweet/GET "/history" []
+      :query-params [symbol :- String resolution from :- Long to :- Long]
+      (ok (.load-series tv symbol resolution from to)))))
 
 
 (defn create-tradingview-routes! [tv]
-  (defroutes tradingview-routes
-     ; Api
+  (defroutes tradingview-routes-raw
     (sweet/api
      {:swagger
       {:ui   "/docs"
        :spec "/swagger.json"
-       :data {:info {:title "clojureQuant"}
+       :data {:info {:title "tradingview"}
               :tags [{:name "tradingview" :description "tradingview.com chart api"}]}}}
-     (add-routes tv))))
+     (sweet/context "/api" [] :tags ["tradingview"]
+       (routes-data tv)
+       (routes-storage tv))))
+  (def tradingview-routes 
+    (wrap-middleware tradingview-routes-raw)))
 
 

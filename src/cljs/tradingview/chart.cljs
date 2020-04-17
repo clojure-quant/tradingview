@@ -16,7 +16,7 @@
   (UDFCompatibleDatafeed. feed-url))
 
 
-(defn init-tradingview! [id feed-url storage-url]
+(defn init-tradingview! [id {:keys [feed-url storage-url]}]
   (let [data-feed (create-feed! feed-url)
         options {:debug true ; false
                  :symbol "DAX Index"
@@ -57,7 +57,7 @@
   (println "shutting down tradingview ..")
   (if (nil? tv)
     (println "tv is nil. Not calling shutdown.")
-    (.remove tv/widget)))
+    (.remove tv)))
 
 
 
@@ -71,7 +71,13 @@
   (println "TradingViewChart.ChangeSymbol: " symbol)
   (.setSymbol tv (symbol->tradingview symbol) "D"))
 
-(defn tradingview-chart [{:keys [feed-url storage-url]}]
+
+(defn change-feed-config [id config tv]
+  (shutdown-tradingview! tv)
+  (init-tradingview! id config))
+
+
+(defn tradingview-chart [config]
   (let [id  (uuid/uuid-string (uuid/make-random-uuid))
         tv (r/atom nil)
         ;state (r/atom {})
@@ -85,21 +91,24 @@
 
       :component-did-mount (fn [_]
                              (println "TradingViewChart.ComponentDidMount")
-                             (reset! tv (init-tradingview! id feed-url storage-url))
+                             (reset! tv (init-tradingview! id config))
                              (.onChartReady @tv #(println "TradingView ChartWidget has loaded!")))
 
       :component-will-unmount (fn [this]
                                 (println "TradingViewChart.ComponentDid-UN-Mount")
                                 (shutdown-tradingview! @tv))
 
-      :component-will-receive-props (fn [this new-argv]
-                                      (println "receive props: " new-argv))
+      ;:component-will-receive-props (fn [this new-argv]
+      ;                                (println "receive props: " new-argv))
 
       :component-did-update (fn [this [_ prev-props prev-more]]
-                              (let [s (r/argv this)]
-                                (println "TradingViewChart.ComponentDidUpdate " s)
-          ;(set-symbol s)
-                                ))})))
+                              (let [[_ new-config] (r/argv this)]
+                                (println "TradingViewChart.ComponentDidUpdate " new-config)
+                                ;(if (not (=
+                                (reset! tv (change-feed-config id new-config @tv))
+                                ))
+
+                                })))
 
 
 #_(defn tradingview-chart []

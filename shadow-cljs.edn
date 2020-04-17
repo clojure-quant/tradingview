@@ -1,0 +1,22 @@
+{ :lein   {:profile "+cljs,+demo"}
+ 
+ ;shadow dev http server settings
+ :dev-http {8000 {:handler demo/routes
+                  :roots ["dev" 
+                          "target/cljs" 
+                          "classpath:public" 
+                          "resources/public" 
+                          "profiles/demo/resources/public"
+                          "classpath:resources"]}} 
+ 
+ :builds {:demo {:target :browser
+                 :output-dir "target/cljs"
+                 :asset-path "/"
+                 :modules {:main {:entries [demo.core]}}
+                 ;:devtools {:before-load pinkgorilla.ui.demo.core/stop
+                 ;           :after-load pinkgorilla.ui.demo.core/start}
+                 }
+          :ci {:target :karma
+               :output-to  "target/ci.js"
+               :ns-regexp "-test$"}}}
+

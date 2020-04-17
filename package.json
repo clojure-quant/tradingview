@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "scripts": {
+    "watch-demo": "shadow-cljs watch demo",
+    "test": "cross-env NODE_ENV=development karma start --single-run"
+  },
+  "devDependencies": {
+    "create-react-class": "^15.6.3",
+    "react": "^16.13.0",
+    "react-dom": "^16.13.0",
+    "react-dom-factories": "^1.0.2",
+    "shadow-cljs": "^2.8.80",
+    "karma": "^4.4.1",
+    "karma-chrome-launcher": "^3.1.0",
+    "karma-cljs-test": "^0.1.0"
+  },
+  "dependencies": {
+    "react-sparklines": "^1.7.0"
+  }
+}

@@ -12,7 +12,6 @@
 (defn remove-empty [series]
   (remove #(= (:close %) "") series))
 
-
 (defn sanitize-series [series]
   (->> series
        (map (fn [row]
@@ -25,7 +24,6 @@
                     :PX_VOLUME :volume}))))
        (remove-nil)
        (remove-empty)))
-
 
 (defn save-series [db symbol series]
   (mc/update db "series"
@@ -56,6 +54,7 @@
 
 ;{$gte ["bongo.date" first]}
 
+
 (defn load-series-partial [db symbol start end]
   (:series (first (mc/aggregate db "series" [{:$match {:symbol symbol}}
                                              {:$project
@@ -64,8 +63,6 @@
                                                                   :as "series"
                                                                   :cond {"$and" [{"$gte" ["$$series.date" start]}
                                                                                  {"$lte" ["$$series.date" end]}]}}}}}]))))
-
-
 
 (defn load-series
   ([db symbol]
@@ -81,7 +78,6 @@
      (:series x)
      (sanitize-series x))))
 
-
 (defn available-range [db symbol]
   (if (vector? symbol)
     (mc/find-maps db "series" {:symbol {:$in symbol}} {:symbol 1 :start 1 :end 1 :save-date 1 :_id 0})
@@ -92,18 +88,15 @@
    (symbols-with-timeseries db {}))
   ([db start end]
    (symbols-with-timeseries db {:start {:$lte start}
-                             :end {:$gte end}}))
+                                :end {:$gte end}}))
   ([db query]
    (mc/find-maps db "series" query {:symbol 1} {:symbol 1 :start 1 :end 1 :save-date 1})))
-
 
 (defn change-symbol [db symbol-old symbol-new]
   (mc/update db "series"
              {:symbol symbol-old}
              {:$set {:symbol symbol-new}}
              {:upsert false}))
-
-
 
 (comment
 
@@ -112,12 +105,10 @@
   (insert-series "ATX Index" [{:close -1 :date (t/date-time 1951 6 1)}
                               {:close -2 :date (t/date-time 1951 6 1)}])
 
-
   (symbols-with-timeseries)
 
   (available-range "BP/ LN Equity")
   (available-range ["BP/ LN Equity" "DAX Index" "ATX Index"])
-
 
   (->> "BP/ LN Equity"
     ;"DAX Index"

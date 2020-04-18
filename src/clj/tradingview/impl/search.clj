@@ -5,7 +5,6 @@
    [monger.query :as mq :refer [with-collection paginate fields]]
    [tradingview.impl.symbol :refer [tradingview-symbol-info]]))
 
-
 (defn search-instrument [db query category exchange limit]
   (let [query {:$or [{:name {:$regex query :$options "i"}}
                      {:symbol {:$regex query :$options "i"}}]}
@@ -34,17 +33,14 @@
       default-value
       field)))
 
-
 (defn search-conversion [row]
   (-> row
       (tradingview-symbol-info)
       (clojure.set/rename-keys {:tradingview :full_name
                                 :display :symbol})))
 
-
 (defn convert-search- [rows]
   (map search-conversion rows))
-
 
 (defn search
   "searches by name/symbol, gives list of symbols"

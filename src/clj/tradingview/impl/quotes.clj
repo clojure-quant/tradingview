@@ -1,7 +1,5 @@
 (ns tradingview.impl.quotes)
 
-
-
 (comment "
 
 GET /quotes?symbols=<ticker_name_1>,<ticker_name_2>,...,<ticker_name_n>

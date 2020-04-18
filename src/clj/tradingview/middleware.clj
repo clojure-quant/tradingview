@@ -1,7 +1,7 @@
 (ns tradingview.middleware
   (:require
    [ring.util.http-response :refer [ok]]
-   
+
    [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
    [ring.middleware.reload :refer [wrap-reload]]
    [ring.middleware.cors :refer [wrap-cors]]
@@ -10,7 +10,6 @@
    [ring.middleware.gzip :refer [wrap-gzip]]
 
 ;   [cheshire.core :refer :all]
-
    ))
 
 (defn allow-cross-origin
@@ -21,23 +20,17 @@
    the browser won't read the data properly.
    The above notes are all based on how Chrome works. "
   ([handler]
-     (allow-cross-origin handler "*"))
+   (allow-cross-origin handler "*"))
   ([handler allowed-origins]
-       (fn [request]
-         (if (= (request :request-method) :options)
-           (-> (ok)                     ; Don't pass the requests down, just return what the browser needs to continue.
-               (assoc-in [:headers "Access-Control-Allow-Origin"] allowed-origins)
-               (assoc-in [:headers "Access-Control-Allow-Methods"] "GET,POST,DELETE")
-               (assoc-in [:headers "Access-Control-Allow-Headers"] "X-Requested-With,Content-Type,Cache-Control,Origin,Accept,Authorization")
-               (assoc :status 200)
-               )
-           (-> (handler request)         ; Pass the request on, but make sure we add this header for CORS support in Chrome.
-               (assoc-in [:headers "Access-Control-Allow-Origin"] allowed-origins))))
-        )
-      )
-
-
-
+   (fn [request]
+     (if (= (request :request-method) :options)
+       (-> (ok)                     ; Don't pass the requests down, just return what the browser needs to continue.
+           (assoc-in [:headers "Access-Control-Allow-Origin"] allowed-origins)
+           (assoc-in [:headers "Access-Control-Allow-Methods"] "GET,POST,DELETE")
+           (assoc-in [:headers "Access-Control-Allow-Headers"] "X-Requested-With,Content-Type,Cache-Control,Origin,Accept,Authorization")
+           (assoc :status 200))
+       (-> (handler request)         ; Pass the request on, but make sure we add this header for CORS support in Chrome.
+           (assoc-in [:headers "Access-Control-Allow-Origin"] allowed-origins))))))
 
 (defn wrap-middleware [routes]
   (-> routes
@@ -48,5 +41,4 @@
       (wrap-params)
       (wrap-multipart-params)
       (wrap-reload) ;wrap reload isn't needed when the clj sources are watched by figwheel
-      (wrap-gzip)
-      ))
+      (wrap-gzip)))

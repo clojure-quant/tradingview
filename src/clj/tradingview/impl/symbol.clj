@@ -7,12 +7,8 @@
    [monger.collection :as mc]
    [monger.joda-time]))
 
-
-
-
 (defn capitalize-category [data]
   (update data :category clojure.string/capitalize))
-
 
 (defn remove-empty-exchange [data]
   (if (clojure.string/blank? (:exchange data))
@@ -46,14 +42,12 @@
 (defn doublepoint-to-space [str]
   (if (nil? str) nil (clojure.string/replace str ":" " ")))
 
-
 (defn space-to-underscore [str]
   (if (nil? str) str
       (clojure.string/replace str " " "_")))
 
 (defn underscore-to-space [str]
   (if (nil? str) nil (clojure.string/replace str "_" " ")))
-
 
 (defn nil-default [str default-value]
   (if (nil? str) default-value str))
@@ -63,7 +57,6 @@
 
 (defn to-epoch-no-ms- [date]
   (int (/ (c/to-long date) 1000)))
-
 
 (defn tradingview-symbol-info
   "Converts instrument [from db] to tradingview symbol-information
@@ -86,7 +79,6 @@
      :type (nil-default (:category instrument) "Index") ; Equity / Index /Curncy
      }))
 
-
 (defn has-no-volume
   [instrument]
   (let [category (:category instrument)]
@@ -97,15 +89,12 @@
       "Index" false
       true)))
 
-
 (def unknown-symbol-response
   {:s "error"
    :errmsg "unknown_symbol"})
 
-
 (defn duplicate-exchange [item]
   (assoc item :exchange-traded (:exchange-listed item)))
-
 
 (defn tradingview-symbol-response [instrument]
   (if (nil? instrument)
@@ -144,7 +133,6 @@
          :expired true ; whether this symbol is an expired futures contract or not.
          :expiration_date  (to-epoch-no-ms- (-> 1 t/hours t/ago))))))
 
-
 (defn load-symbol
   ([db symbol]
    (mc/find-one-as-map db "instruments" {:symbol symbol}))
@@ -153,6 +141,8 @@
 
 
 ;https://demo_feed.tradingview.com/symbols?symbol=BP
+
+
 (defn tradingview-symbol-info-request
   "gets information about one instrument
    important data for chart:

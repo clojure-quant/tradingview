@@ -1,0 +1,16 @@
+{
+  "description": "Demonstrating webRequests",
+  "manifest_version": 2,
+  "name": "AAA FLO",
+  "version": "1.0",
+
+  "permissions": [
+    "webRequest",
+    "webRequestBlocking",
+    "<all_urls>"
+  ],
+
+  "background": {
+    "scripts": ["background.js"]
+  }
+}

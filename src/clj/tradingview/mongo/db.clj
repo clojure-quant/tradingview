@@ -10,6 +10,7 @@
 
 ; MOUNT SERVICE DEFINITION
 
+
 (defn make-tunnel [remote-ip remote-port local-port private-key username]
   (info "creating ssh tunnel to" remote-ip ":" remote-port)
   (let [agent (ssh/ssh-agent {})]
@@ -17,7 +18,6 @@
     (let [session (ssh/session agent remote-ip {:username username :strict-host-key-checking :no})]
       (ssh/connect session
                    (ssh/forward-local-port session local-port remote-port)))))
-
 
 (defn connect [config]
   (let [config (:mongo config)
@@ -34,6 +34,7 @@
 
 
 ; ACTIONS
+
 
 (defn in?
   "true if coll contains elm"
@@ -57,7 +58,7 @@
 ;  (mc/find-one-as-map  db "instruments" { :symbol symbol }))
 
 (comment ; *************************************************************************
-  
+
 ; test db connection
   (do
     (def test- (connect))
@@ -67,12 +68,13 @@
 
 
 ; use db services (requires started mount services)
+
+
   (println (mc/find-one-as-map db "instruments" {:symbol "DAX Index"}))
 
   (separate-category {:symbol "MO equity " :name "jghf "})
   (in? ["Equity" "Index" "Curncy"] (:category {:category "Index" :bonho 88}))
-  
-  
-  ; ********************************************************************************
 
-  ) 
+
+  ; ********************************************************************************
+  )

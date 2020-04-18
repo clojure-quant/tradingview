@@ -30,7 +30,7 @@
   [[org.clojure/clojure "1.10.0"]
    [org.clojure/core.async "0.4.474" :exclusions [org.clojure/tools.reader]]
    [clj-http "3.10.0"]  ; http requests
-   ;[json-html "0.4.7"]
+   [json-html "0.4.7"]
    ]
 
 

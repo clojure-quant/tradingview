@@ -9,6 +9,7 @@
 
 ; history
 
+
 (def empty-result- {:t [] :o [] :h [] :l [] :c [] :v []})
 
 ;; Remark: Bar time for daily bars should be 00:00 UTC and is expected to be a trading day (not a day when the session starts). Charting Library aligns the time according to the Session from SymbolInfo.
@@ -66,20 +67,17 @@
     "M"  :monthly
     "1M" :monthly))
 
-
 (def yyyyMMdd-
   (fmt/formatter "yyyy-MM-dd"))
 
 (defn dt2str [epoch]
   (fmt/unparse yyyyMMdd- epoch))
 
-
 (defn no-data [db-end-date]
   {:s "no_data"
     ;:t [] :o [] :h [] :l [] :c [] :v []
     ; :nextTime  (to-epoch-no-ms- db-end-date)
    })
-
 
 (defn tradingview-series [db symbol resolution from to]
   (let [dt-from (to-date from)
@@ -107,30 +105,14 @@
 
 (comment
 
-  (println (> 0 0))
-
-  ; mongodb tests
-  (load-symbol "DAX Index" [:symbol :name])
-  (mongo.series/load-series-partial "DAX Index", (-> 14 t/days t/ago) (t/now))
-  (mongo.series/load-series-partial "BP/ LN Equity", (-> 14 t/days t/ago) (t/now))
-
-  ; epoch conversions
-  (to-epoch-no-ms- (t/now))
-  (to-epoch-no-ms- (-> 14 t/days t/ago))
-  (type (to-date- 1487289600))
-  (type (t/date-time 2010 10 3))
-
-  (epoch2str 1487289600)
-  (c/from-long 1487289600000)
-
-  (println yyyyMMdd-)
-  (fmt/unparse yyyyMMdd- (t/date-time 2010 10 3))
 
   ; HISTORY endpoint
   ;https://demo_feed.tradingview.com/history?symbol=AAPL&resolution=D&from=1567457308&to=1568321308
+
+
   (history "DAX Index" "D" 1567165656 1568375219)
   (history "BP/ LN Equity" "D" 1567165656 1568375219)
 
-  (server-time)
 
-  (interval "D"))
+;
+  )

@@ -10,8 +10,7 @@
   ; [cheshire.core :refer :all]
   ; [cemerick.url :refer (url url-encode map->query)]
    [tradingview.impl.time :refer [server-time]]
-   [tradingview.middleware :refer [wrap-middleware]]
-   ))
+   [tradingview.middleware :refer [wrap-middleware]]))
 
 (s/defschema Chart
   {:symbol String
@@ -42,7 +41,6 @@
     (save-chart-wrapped tv  client user       name content symbol resolution)
     (modify-chart-wrapped tv client user chart name content symbol resolution)))
 
-
 (defn routes-storage [tv]
   (sweet/context "/tradingviewstorage" [] :tags ["storage"]
 
@@ -72,6 +70,8 @@
 
 
         ; storage
+
+
     (sweet/GET "/1.1/study_templates" []
       :query-params [client :- s/Int user :- s/Int {chart :- s/Int 0}]
       (ok (if (= chart 0)
@@ -88,7 +88,6 @@
     (sweet/DELETE "/1.1/study_templates" []
       :query-params [client :- s/Int user :- s/Int {template :- s/Str ""}]
       (ok (do (.delete-template tv client user template) {:status "ok"})))))
-
 
 (defn routes-data [tv]
   (sweet/context "/tradingview" [] :tags ["data"]
@@ -118,7 +117,6 @@
       :query-params [symbol :- String resolution from :- Long to :- Long]
       (ok (.load-series tv symbol resolution from to)))))
 
-
 (defn create-tradingview-routes! [tv]
   (defroutes tradingview-routes-raw
     (sweet/api
@@ -130,7 +128,7 @@
      (sweet/context "/api" [] :tags ["tradingview"]
        (routes-data tv)
        (routes-storage tv))))
-  (def tradingview-routes 
+  (def tradingview-routes
     (wrap-middleware tradingview-routes-raw)))
 
 

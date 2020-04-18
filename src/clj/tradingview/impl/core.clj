@@ -14,7 +14,6 @@
     ;[tradingview.group]
    ))
 
-
 (defn tradingview! [db]
   (reify tradingview-template
     (config [this] server-features/server-features)

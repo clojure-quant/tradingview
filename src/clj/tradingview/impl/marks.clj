@@ -14,7 +14,6 @@
 ;  }
 
 
-
 (comment "
 Request: GET /marks?symbol=<ticker_name>&from=<unix_timestamp>&to=<unix_timestamp>&resolution=<resolution>
 

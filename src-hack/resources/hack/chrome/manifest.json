@@ -1,0 +1,16 @@
+{
+"background": {
+    "scripts": [ "chrome.js" ]
+ },
+"manifest_version": 2,
+
+"name": "AAA FLO",
+"description": "Track social interactions by social site and customizable categories.",
+"version": "1.0",
+
+"browser_action": {
+  "default_icon": "icon.png"
+
+},
+"permissions": [ "webRequest", "webRequestBlocking", "webNavigation", "tabs", "<all_urls>", "debugger" ]
+}

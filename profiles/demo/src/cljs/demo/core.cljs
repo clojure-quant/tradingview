@@ -8,8 +8,8 @@
 (def config-tradingview-demo {:feed-url "https://demo_feed.tradingview.com"
                               :storage-url "https://saveload.tradingview.com"})
 
-(def config-dev {:feed-url "http://localhost:8000/api/tradingview"
-                 :storage-url "http://localhost:8000/api/tradingviewstorage"})
+(def config-dev {:feed-url "http://localhost:8087/api/tradingview"
+                 :storage-url "http://localhost:8087/api/tradingviewstorage"})
 
 (def config-prod {:feed-url "https://quant.hoertlehner.com/api/tradingview"
                   :storage-url "https://quant.hoertlehner.com/api/tradingviewstorage"})

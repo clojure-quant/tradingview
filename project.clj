@@ -20,17 +20,24 @@
                   ["vcs" "commit" "Begin %s"]
                   ["vcs" "push"]]
 
-
   :source-paths ["src/clj"]
   :test-paths ["test"]
   :resource-paths  ["resources"]
     ; :main ^:skip-aot app.main
 
   :dependencies
-  [[org.clojure/clojure "1.10.0"]
-   [org.clojure/core.async "0.4.474" :exclusions [org.clojure/tools.reader]]
-   [clj-http "3.10.0"]  ; http requests
-   [json-html "0.4.7"]
+  [[org.clojure/clojure "1.10.1"]
+   [org.clojure/core.async "1.1.582" :exclusions [org.clojure/tools.reader]]
+
+   ; MongoDB with ssh tunnel
+   [com.novemberain/monger "3.5.0" :exclusions [com.google.guava/guava]]
+   [clj-commons/clj-ssh "0.5.15"]  ; SSH Tunnel
+
+   ; Route handling
+   [compojure "1.6.1"]                        ; Server-Side Routing
+   [metosin/compojure-api "1.1.13"]           ; sweet-api
+   [cheshire "5.8.0"]                         ; JSON encoding
+   [amalloy/ring-gzip-middleware "0.1.4"]     ; gzip compress responses
    ]
 
 
@@ -41,31 +48,29 @@
                     :dependencies  [[thheller/shadow-cljs "2.8.80"]
                                     [thheller/shadow-cljsjs "0.0.21"]
 
-                                    [com.novemberain/monger "3.5.0" :exclusions [com.google.guava/guava]]
-                                    [clj-commons/clj-ssh "0.5.15"]  ; SSH Tunnel
-
-                                                  ; Web Server
-                                    [ring "1.7.0"]
-                                    [ring/ring-core "1.7.0"]
-                                    [ring/ring-devel "1.7.0"]
-                                    [ring/ring-jetty-adapter "1.7.0"]          ; needs to match compojure version
+                                    ; Web Server
+                                    ;[ring "1.7.0"]
+                                    ;[ring/ring-core "1.7.0"]
+                                    ;[ring/ring-devel "1.7.0"]
+                                    ;[ring/ring-jetty-adapter "1.7.0"]          ; needs to match compojure version
                                     [ring/ring-defaults "0.3.2"]
                                     [ring/ring-codec "1.1.1"]
                                     [ring-cors "0.1.12"]                       ; CORS requests
-                                    [compojure "1.6.1"]                        ; Server-Side Routing
-                                    [metosin/compojure-api "1.1.10"]
                                     [hiccup "1.0.5"]                           ; Templating Server/Side
-                                    [cheshire "5.8.0"]                         ; JSON encoding
-                                    [amalloy/ring-gzip-middleware "0.1.4"]     ; gzip compress responses
                                     [com.cemerick/url "0.1.1"]
 
                                     ; CSV parsing
                                     [org.clojure/data.csv "0.1.4"]
                                     [org.clojure/data.xml "0.0.7"]
 
-                                 
-                                                  ;; LOGGING DEPS
-                                    [org.clojure/tools.logging "0.2.4"]
+
+                                    [clj-http "3.10.0"  ;http requests
+                                     :exclusions [potemkin]] ;compojure-api has newer
+                                    [json-html "0.4.7"]
+
+
+                                      ;; LOGGING DEPS
+                                    [org.clojure/tools.logging "0.2.6"]
                                     ;[org.slf4j/slf4j-log4j12 "1.7.1"]
                                     ;[log4j/log4j "1.2.17" :exclusions [javax.mail/mail
                                     ;                                   javax.jms/jms
@@ -76,14 +81,11 @@
                                     ]}
 
              :cljs {:source-paths ["src/cljs"]
-                    :dependencies [[thheller/shadow-cljs "2.8.80"]
-                                   [thheller/shadow-cljsjs "0.0.21"]
-                                   [org.clojure/clojurescript "1.10.597"
+                    :dependencies [[org.clojure/clojurescript "1.10.597"
                                     :scope "provided"
                                     :exclusions [com.google.javascript/closure-compiler-unshaded
                                                  org.clojure/google-closure-library
                                                  org.clojure/google-closure-library-third-party]]
-                                   ;[hiccups "0.3.0"]
                                    ;[thi.ng/strf "0.2.2"]
                                    ;[noencore "0.3.4"]
                                    [com.lucasbradstreet/cljs-uuid-utils "1.0.2"]
@@ -91,8 +93,10 @@
                                     :exclusions [org.clojure/tools.reader
                                                  cljsjs/react
                                                  cljsjs/react-dom]]
-                                   ;[thi.ng/strf "0.2.2"]
-                                   [re-frame "0.10.5"]]}
+                                   [re-frame "0.10.5"]
+
+                                   [thheller/shadow-cljs "2.8.80"]
+                                   [thheller/shadow-cljsjs "0.0.21"]]}
 
              :dev {:dependencies [[clj-kondo "2019.11.23"]]
                    :plugins      [[lein-cljfmt "0.6.6"]]

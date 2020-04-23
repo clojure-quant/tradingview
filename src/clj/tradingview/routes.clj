@@ -10,7 +10,8 @@
   ; [cheshire.core :refer :all]
   ; [cemerick.url :refer (url url-encode map->query)]
    [tradingview.impl.time :refer [server-time]]
-   [tradingview.middleware :refer [wrap-middleware]]))
+   [tradingview.middleware :refer [wrap-middleware]]
+   [tradingview.study.hack-routes :refer [tvhack-routes]]))
 
 (s/defschema Chart
   {:symbol String
@@ -127,7 +128,10 @@
               :tags [{:name "tradingview" :description "tradingview.com chart api"}]}}}
      (sweet/context "/api" [] :tags ["tradingview"]
        (routes-data tv)
-       (routes-storage tv))))
+       (routes-storage tv))
+     tvhack-routes
+     
+     ))
   (def tradingview-routes
     (wrap-middleware tradingview-routes-raw)))
 

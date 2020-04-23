@@ -1,7 +1,7 @@
 {:lein   {:profile "+cljs,+demo"}
 
  ;shadow dev http server settings
- :dev-http {8000 {:handler demo.routes/routes
+ :dev-http {8087 {:handler demo.routes/routes
                   :roots ["resources/public"
                           "profiles/demo/resources/public"
                           "classpath:resources"
@@ -15,14 +15,10 @@
                  ;:devtools {:before-load pinkgorilla.ui.demo.core/stop
                  ;           :after-load pinkgorilla.ui.demo.core/start}
                  :compiler-options {:source-map true}
-
                  :js-options {:resolve {"tradingview-lib" {:target :file
                                                            :file "src/js/charting_library.min.js"}
                                         "tradingview-udf" {:target :file
-                                                           :file "src/js/UDF/bundle.js"}}
-                              
-                              
-                              }}
+                                                           :file "src/js/UDF/bundle.js"}}}}
           :ci {:target :karma
                :output-to  "target/ci.js"
                :ns-regexp "-test$"}}}

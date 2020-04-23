@@ -2,7 +2,6 @@
   (:require
    [clojure.java.io :as io]
    [cheshire.core :refer [parse-string]]
-
    [json-html.core :refer [json->html]]
    ;[hiccup.core :refer :all]
    [hiccup.page :as page]

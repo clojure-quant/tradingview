@@ -11,8 +11,11 @@
 (def config-dev {:feed-url "http://localhost:8087/api/tradingview"
                  :storage-url "http://localhost:8087/api/tradingviewstorage"})
 
-(def config-prod {:feed-url "https://quant.hoertlehner.com/api/tradingview"
+#_(def config-prod {:feed-url "https://quant.hoertlehner.com/api/tradingview"
                   :storage-url "https://quant.hoertlehner.com/api/tradingviewstorage"})
+
+(def config-prod {:feed-url "https://tradingview.bitblockart.com/api/tradingview"
+                  :storage-url "https://tradingview.bitblockart.com/api/tradingviewstorage"})
 
 (def config-our (if (dev?)
                   config-dev ; use dev when no hostname is being returned.

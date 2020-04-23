@@ -163,16 +163,17 @@
             ["with-profile" "+demo,+dev" "shell" "shadow-cljs" "compile" "demo"]
 
             "demo"  ^{:doc "Runs UI components via webserver."}
-            ["with-profile" "+demo,+dev" "shell" "shadow-cljs" "watch" "demo"]
+            ;["with-profile" "+demo,+dev" "shell" "shadow-cljs" "watch" "demo"]
+            ["with-profile" "+demo,+dev,+cljs" "run" "-m" "shadow.cljs.devtools.cli" "watch" ":demo"]
 
             ;"test-run" ^{:doc "Runs unit tests. Does not build the bundle first.."}
             ;["shell" "./node_modules/karma/bin/karma" "start" "--single-run"]
-
+            
             ;"test-clj" ^{:doc "Run Unit Tests. "}
             ; ["with-profile" "+demo,+dev" "test"]
-
+            
             ;"test-js" ^{:doc "Run Unit Tests. Will compile bundle first."}
             ;["do" "build-test" ["test-run"]]
-
+            
             "bump-version" ^{:doc "Increases project.clj version number (used by CI)."}
             ["change" "version" "leiningen.release/bump-version"]})

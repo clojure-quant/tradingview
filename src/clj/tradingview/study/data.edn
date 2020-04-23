@@ -1,0 +1,39 @@
+
+
+  {:description "bitcoin halfing cycles"
+   :content {:filename "blob.gz"
+             :content-type "application/gzip"
+             :tempfile "#object[java.io.File 0x2b43b9b9 /tmp/ring-multipart-579299764763992157.tmp]"
+             :size 109358}
+   :savingToken "0.9223671831378418"
+   :listed_exchange "BITFINEX"
+   :symbol "BITFINEX:BTCUSD"
+   :name "bitcoin halfing cycles"
+   :is_realtime 1
+   :publish_request_id "5pwlao44yl3"
+   :short_name "BTCUSD"
+   :resolution "1D"
+   :legs [{:symbol "BITFINEX:BTCUSD" :pro_symbol "BITFINEX:BTCUSD"}]
+   :id 12630490
+   :exchange "BITFINEX"
+   :symbol_type "bitcoin"}
+
+{:content {:filename blob.gz, 
+           :content-type application/gzip, 
+           :tempfile #object[java.io.File 0x36098af4 /tmp/ring-multipart-6896321772800377240.tmp, 
+                             :size 110540]},
+
+ :name bitcoin halfing cycles
+ :symbol HITBTC:DASHUSD 
+ :resolution 1D, 
+ :id 12630490
+ 
+ :description bitcoin halfing cycles, 
+ :savingToken 0.9039487910103734, 
+ :listed_exchange HITBTC, 
+ :is_realtime 1, 
+ :short_name DASHUSD, 
+ :publish_request_id wda5kcfqcud, 
+ :legs [{"symbol":"HITBTC:DASHUSD","pro_symbol":"HITBTC:DASHUSD"}], 
+ :exchange HITBTC, 
+ :symbol_type bitcoin}

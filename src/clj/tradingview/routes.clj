@@ -29,17 +29,24 @@
    :content String})
 
 (defn save-chart-wrapped [tv client user name content symbol resolution]
-  (let [data {:name name :content content :symbol symbol :resolution resolution}]
+  (let [data {:name name 
+              :content content 
+              :symbol symbol 
+              :resolution resolution}]
     {:status "ok" :id (.save-chart tv client user data)}))
 
 (defn modify-chart-wrapped [tv client user chart name content symbol resolution]
-  (let [data {:name name :content content :symbol symbol :resolution resolution :chart_id chart}]
+  (let [data {:name name
+              :content content
+              :symbol symbol
+              :resolution resolution
+              :chart_id chart}]
     (.modify-chart tv client user chart data)
     {:status "ok"}))
 
 (defn save-or-modify-chart [tv client user chart name content symbol resolution]
   (if (= chart 0)
-    (save-chart-wrapped tv  client user       name content symbol resolution)
+    (save-chart-wrapped   tv client user       name content symbol resolution)
     (modify-chart-wrapped tv client user chart name content symbol resolution)))
 
 (defn routes-storage [tv]
@@ -129,9 +136,7 @@
      (sweet/context "/api" [] :tags ["tradingview"]
        (routes-data tv)
        (routes-storage tv))
-     tvhack-routes
-     
-     ))
+     (tvhack-routes tv)))
   (def tradingview-routes
     (wrap-middleware tradingview-routes-raw)))
 

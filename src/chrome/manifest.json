@@ -5,7 +5,7 @@
 "manifest_version": 2,
 
 "name": "AAA FLO",
-"description": "Track social interactions by social site and customizable categories.",
+"description": "tradingviews storage interceptor",
 "version": "1.0",
 
 "browser_action": {

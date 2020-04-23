@@ -44,7 +44,9 @@
 (defn save-chart
   [db client-id user-id data]
   (let [chart-id (generate-id)
-        query {:client_id client-id :user_id user-id :chart_id chart-id}
+        query {:client_id client-id 
+               :user_id user-id 
+               :chart_id chart-id}
         doc (merge data query)
         doc (merge doc {:timestamp (t/now)})]
     (mc/update db "tvchart" query doc {:upsert true})
@@ -52,10 +54,12 @@
 
 (defn modify-chart
   [db client-id user-id chart-id data]
-  (let [query {:client_id client-id :user_id user-id :chart_id chart-id}
+  (let [query {:client_id client-id 
+               :user_id user-id 
+               :chart_id chart-id}
         doc (merge data query)
         doc (merge doc {:timestamp (t/now)})]
-    (mc/update db "tvchart" query doc {:upsert false})))
+    (mc/update db "tvchart" query doc {:upsert true})))
 
 (defn delete-chart
   [db client-id user-id chart-id]

@@ -4,6 +4,8 @@
    [tradingview.mongo.db :refer [connect disconnect]]
    [tradingview.impl.core :refer [tradingview!]]))
 
+(println "template-test")
+
 (def config
   {:mongo {:mongo-ip "127.0.0.1"
            :mongo-port 27017

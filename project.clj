@@ -5,8 +5,8 @@
                                      :username :env/release_username
                                      :password :env/release_password
                                      :sign-releases false}]]
-
-  :min-lein-version "2.9.1"
+  :min-java-version "1.11"
+  :min-lein-version "2.9.0"
 
   :plugins [[lein-shell "0.5.0"]
             [lein-ancient "0.6.15"]]
@@ -22,81 +22,67 @@
 
   :source-paths ["src/clj"]
   :test-paths ["test"]
-  :resource-paths  ["resources"]
-    ; :main ^:skip-aot app.main
+  :resource-paths  ["resources"
+                    "target/cljsbuild"]
 
   :dependencies
   [[org.clojure/clojure "1.10.1"]
    [org.clojure/core.async "1.1.582" :exclusions [org.clojure/tools.reader]]
+   [org.clojure/tools.logging "0.2.6"]
 
    ; MongoDB with ssh tunnel
    [com.novemberain/monger "3.5.0" :exclusions [com.google.guava/guava]]
    [clj-commons/clj-ssh "0.5.15"]  ; SSH Tunnel
-
+   
    ; Route handling
+   [ring/ring-defaults "0.3.2"]
+   ;  [ring/ring-codec "1.1.1"]
+   [ring-cors "0.1.12"]                       ; CORS requests
    [compojure "1.6.1"]                        ; Server-Side Routing
    [metosin/compojure-api "1.1.13"]           ; sweet-api
    [cheshire "5.8.0"]                         ; JSON encoding
    [amalloy/ring-gzip-middleware "0.1.4"]     ; gzip compress responses
+   [hiccup "1.0.5"]                           ; Templating Server/Side
+   
+   ; visualization of tradingview saved charts
+   [json-html "0.4.7"]
+   [clj-time "0.15.2"]] ; joda-time wrapper for clj
 
-   [clj-time "0.15.2"] ; joda-time wrapper for clj
-   ]
+  
+  :clean-targets ^{:protect false} ["target/classes" 
+                                    "target/stale"
+                                    ;"resources/static/cljs/"
+                                    ]
 
+  :profiles {:uberjar {; UberJar contains code plus resources  
+                       ; jar contains only code
+                       :aot :all
+                       :main ^:skip-aot demo.main
+                       :source-paths ["profiles/demo/src/clj"]
+                       :resource-paths ["profiles/demo/resources"]
+                       :dependencies [; Web Server
+                                      [ring "1.7.0"]
+                                      [ring/ring-core "1.7.0"]
+                                     ;[ring/ring-devel "1.7.0"]
+                                      [ring/ring-jetty-adapter "1.7.0"]  ; needs to match compojure version
+                                      ]}
 
-  :profiles {:uberjar {:aot :all}  ; UberJar contains code plus resources  ; jar contains only code
+             :demo {:source-paths ["profiles/demo/src/clj"]
+                    :resource-paths ["profiles/demo/resources"]}
 
-             :demo {:source-paths ["profiles/demo/src/cljs"
-                                   "profiles/demo/src/clj"]
-                    :dependencies  [[thheller/shadow-cljs "2.8.80"]
-                                    [thheller/shadow-cljsjs "0.0.21"]
-
-                                    ; Web Server
-                                    ;[ring "1.7.0"]
-                                    ;[ring/ring-core "1.7.0"]
-                                    ;[ring/ring-devel "1.7.0"]
-                                    ;[ring/ring-jetty-adapter "1.7.0"]          ; needs to match compojure version
-                                    [ring/ring-defaults "0.3.2"]
-                                    [ring/ring-codec "1.1.1"]
-                                    [ring-cors "0.1.12"]                       ; CORS requests
-                                    [hiccup "1.0.5"]                           ; Templating Server/Side
-                                    [com.cemerick/url "0.1.1"]
-
-                                    ; CSV parsing
-                                    [org.clojure/data.csv "0.1.4"]
-                                    [org.clojure/data.xml "0.0.7"]
-
-
-                                    [clj-http "3.10.0"  ;http requests
-                                     :exclusions [potemkin]] ;compojure-api has newer
-                                    [json-html "0.4.7"]
-
-
-                                      ;; LOGGING DEPS
-                                    [org.clojure/tools.logging "0.2.6"]
-                                    ;[org.slf4j/slf4j-log4j12 "1.7.1"]
-                                    ;[log4j/log4j "1.2.17" :exclusions [javax.mail/mail
-                                    ;                                   javax.jms/jms
-                                    ;                                   com.sun.jmdk/jmxtools
-                                    ;                                   com.sun.jmx/jmxri]]
-                                    ;[ch.qos.logback/logback-core "1.1.2"]
-                                    ;[ch.qos.logback/logback-classic "1.1.2"]
-                                    ]}
-
-             :cljs {:source-paths ["src/cljs"]
+             :cljs {:source-paths ["src/cljs"
+                                   "profiles/demo/src/cljs"]
                     :dependencies [[org.clojure/clojurescript "1.10.597"
                                     :scope "provided"
                                     :exclusions [com.google.javascript/closure-compiler-unshaded
                                                  org.clojure/google-closure-library
                                                  org.clojure/google-closure-library-third-party]]
-                                   ;[thi.ng/strf "0.2.2"]
-                                   ;[noencore "0.3.4"]
                                    [com.lucasbradstreet/cljs-uuid-utils "1.0.2"]
                                    [reagent "0.10.0"
                                     :exclusions [org.clojure/tools.reader
                                                  cljsjs/react
                                                  cljsjs/react-dom]]
                                    [re-frame "0.10.5"]
-
                                    [thheller/shadow-cljs "2.8.80"]
                                    [thheller/shadow-cljsjs "0.0.21"]]}
 
@@ -154,28 +140,18 @@
                 ;;                        (apply handler args)))]
                  }
 
-  :aliases {"clean"  ^{:doc "Cleans build artefacts."}
-            ["shell" "./scripts/clean.sh"]
-
-            ;"build-shadow-ci" ["run" "-m" "shadow.cljs.devtools.cli" "compile" ":demo"] ; :ci
+  :aliases {;"build-shadow-ci" ["run" "-m" "shadow.cljs.devtools.cli" "compile" ":demo"] ; :ci
             "build-shadow-demo"
             ["run" "-m" "shadow.cljs.devtools.cli" "watch" ":demo"]
 
             "build-cljs"  ^{:doc "Builds Bundle. Gets executed automatically before unit tests."}
-            ["with-profile" "+demo,+dev" "shell" "shadow-cljs" "compile" "demo"]
+            ["with-profile" "+demo,+cljs" "shell" "shadow-cljs" "compile" "demo"]
 
             "demo"  ^{:doc "Runs UI components via webserver."}
-            ;["with-profile" "+demo,+dev" "shell" "shadow-cljs" "watch" "demo"]
             ["with-profile" "+demo,+dev,+cljs" "run" "-m" "shadow.cljs.devtools.cli" "watch" ":demo"]
 
-            ;"test-run" ^{:doc "Runs unit tests. Does not build the bundle first.."}
-            ;["shell" "./node_modules/karma/bin/karma" "start" "--single-run"]
-
-            ;"test-clj" ^{:doc "Run Unit Tests. "}
-            ; ["with-profile" "+demo,+dev" "test"]
-
-            ;"test-js" ^{:doc "Run Unit Tests. Will compile bundle first."}
-            ;["do" "build-test" ["test-run"]]
+            "build-jar"  ^{:doc "Builds java jar file (and compiles frontend bundle)"}
+            ["do" ["build-cljs"] "uberjar"]
 
             "bump-version" ^{:doc "Increases project.clj version number (used by CI)."}
             ["change" "version" "leiningen.release/bump-version"]})

@@ -1,14 +1,10 @@
 (ns tradingview.routes
   (:require
-   [clojure.string :as str]
    [schema.core :as s]
    [ring.util.response :refer [response]]
    [ring.util.http-response :refer [ok]]
    [compojure.core :refer [defroutes GET]]
-   ;[compojure.route :as route]
    [compojure.api.sweet :as sweet]
-  ; [cheshire.core :refer :all]
-  ; [cemerick.url :refer (url url-encode map->query)]
    [tradingview.impl.time :refer [server-time]]
    [tradingview.middleware :refer [wrap-middleware]]
    [tradingview.study.hack-routes :refer [tvhack-api-routes]]
@@ -132,8 +128,6 @@
      ; ui routes
     (GET "/hacked-chart-list" []
       (chart-list-page tv))
-    (GET "/hacked-chart-json" [id]
-      (response (chart-json tv id)))
     (GET "/hacked-chart-raw" [id]
       (chart-raw-page tv id))
     (GET "/hacked-chart-extract" [id]

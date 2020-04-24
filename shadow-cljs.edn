@@ -6,10 +6,11 @@
                           "profiles/demo/resources/public"
                           "classpath:resources"
                           "classpath:public"
-                          "target"]}}
+                          "classpath:app"
+                          #_"target"]}}
 
  :builds {:demo {:target :browser
-                 :output-dir "target/cljs"
+                 :output-dir "target/cljsbuild/app"
                  :asset-path "/cljs"
                  :modules {:main {:entries [demo.core]}}
                  ;:devtools {:before-load pinkgorilla.ui.demo.core/stop

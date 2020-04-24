@@ -17,9 +17,11 @@
    [:td (:name c)]
    [:td (:symbol c)]
    [:td
-    [:a.link {:href (str "/hacked-chart-json?id=" (:id c))} "json "]
-    [:a.link {:href (str "/hacked-chart-raw?id=" (:id c))} " raw "]
-    [:a.link {:href (str "/hacked-chart-extract?id=" (:id c))} " extract"]]])
+    [:a.link {:href (str "/api/tvhack/json?id=" (:id c))} "json-download"]
+    [:span "  "]
+    [:a.link {:href (str "/hacked-chart-raw?id=" (:id c))} "json-visualized"]
+    [:span "  "]
+    [:a.link {:href (str "/hacked-chart-extract?id=" (:id c))} "download extracted data"]]])
 
 
 (defn chart-list-page [tv]
@@ -45,10 +47,11 @@
 (defn chart-json [tv id]
   (println "chart-json chart-id: " id)
   (let [chart (.load-chart tv 77 77 (Integer/parseInt id))
-        json-str (generate-string (:content chart))
+        json (:content chart)
+        ;json-str (generate-string (:content chart))
         ;_ (println "json: " json-str)
         ]
-    json-str))
+    json))
 
 
 (defn chart-raw-page [tv id]

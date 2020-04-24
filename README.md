@@ -26,7 +26,22 @@ lein demo
 ```
 Webserver runs on port 8087.
 
+## Build Java JAR 
 
+```
+npm install
+lein build-jar
+```
+jar gets saved to: target/tradingview-0.0.1-SNAPSHOT.jar
+## Run Java JAR
+
+JARS are already compiled, so they are faster - good for production. 
+The frontend bundle is compiled inside the jar.
+Webserver runs on port 8087.
+
+```
+java -jar target/tradingview-0.0.1-SNAPSHOT-standalone.jar
+```
 
 ## Tradingview Demo Feed
 

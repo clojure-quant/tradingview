@@ -2,10 +2,12 @@
   (:require
    [clojure.string :as str]
    [cheshire.core :refer [parse-string]]
-   [ring.util.response :as response]
+   [ring.util.response :refer [response redirect]]
    [ring.util.http-response :refer [ok]]
    [compojure.api.sweet :as sweet]
-   [clojure.java.io :refer [input-stream]])
+   [clojure.java.io :refer [input-stream]]
+   [tradingview.study.views :refer [chart-json]]
+   )
   (:import [java.io File])
   (:import [java.util.zip GZIPInputStream]))
 
@@ -30,6 +32,11 @@
 
 (defn tvhack-api-routes [tv]
   (sweet/context "/tvhack" [] :tags ["tvhack"]
+
+    (sweet/GET "/json" []
+      :query-params [id :- String]
+      (ok (chart-json tv id)))
+
     (sweet/POST "/dump" {params :params}
       (let [file-params (:content params)
             tv-params (dissoc params :content)
@@ -45,4 +52,4 @@
              (assoc tv-params :content)
         ;     #(dissoc % :savingToken :id)
              (.modify-chart tv 77 77 id))
-        (response/redirect "https://www.tradingview.com/savechart/bongistan")))))
+        (redirect "https://www.tradingview.com/savechart/bongistan")))))

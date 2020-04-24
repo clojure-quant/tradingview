@@ -9,6 +9,7 @@
 
   (load-series [this symbol resolution from to])
 
+  (load-charts [this client user])
   (load-chart [this client user chart-id])
   (save-chart [this client-id user-id data])
   (modify-chart [this client-id user-id chart-id data])

@@ -2,9 +2,9 @@
 
 // configuration
 
-var url_our_server = "http://localhost:8087/tvhack/dump"
+// var url_our_server = "http://localhost:8087/tvhack/dump"
 
-// var url_our_server = "https://tradingview.bitblockart.com/tvhack/dump"
+ var url_our_server = "https://tradingview.bitblockart.com/tvhack/dump"
 
 
 function checkRaw (req) {

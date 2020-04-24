@@ -2,7 +2,7 @@
   (:require
    [clojure.string :as str]
    [schema.core :as s]
-   [ring.util.response :as response]
+   [ring.util.response :refer [response]]
    [ring.util.http-response :refer [ok]]
    [compojure.core :refer [defroutes GET]]
    ;[compojure.route :as route]
@@ -11,7 +11,9 @@
   ; [cemerick.url :refer (url url-encode map->query)]
    [tradingview.impl.time :refer [server-time]]
    [tradingview.middleware :refer [wrap-middleware]]
-   [tradingview.study.hack-routes :refer [tvhack-routes]]))
+   [tradingview.study.hack-routes :refer [tvhack-api-routes]]
+   [tradingview.study.views :refer [chart-list-page chart-raw-page]]
+   [tradingview.study.extract :refer [chart-extract-page]]))
 
 (s/defschema Chart
   {:symbol String
@@ -29,9 +31,9 @@
    :content String})
 
 (defn save-chart-wrapped [tv client user name content symbol resolution]
-  (let [data {:name name 
-              :content content 
-              :symbol symbol 
+  (let [data {:name name
+              :content content
+              :symbol symbol
               :resolution resolution}]
     {:status "ok" :id (.save-chart tv client user data)}))
 
@@ -127,6 +129,14 @@
 
 (defn create-tradingview-routes! [tv]
   (defroutes tradingview-routes-raw
+     ; ui routes
+    (GET "/hacked-chart-list" []
+      (chart-list-page tv))
+    (GET "/hacked-chart-raw" [id]
+      (chart-raw-page tv id))
+    (GET "/hacked-chart-extract" [id]
+      (response (chart-extract-page tv id)))
+     ; api routes
     (sweet/api
      {:swagger
       {:ui   "/docs"
@@ -136,7 +146,7 @@
      (sweet/context "/api" [] :tags ["tradingview"]
        (routes-data tv)
        (routes-storage tv))
-     (tvhack-routes tv)))
+     (tvhack-api-routes tv)))
   (def tradingview-routes
     (wrap-middleware tradingview-routes-raw)))
 

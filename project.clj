@@ -38,6 +38,8 @@
    [metosin/compojure-api "1.1.13"]           ; sweet-api
    [cheshire "5.8.0"]                         ; JSON encoding
    [amalloy/ring-gzip-middleware "0.1.4"]     ; gzip compress responses
+
+   [clj-time "0.15.2"] ; joda-time wrapper for clj
    ]
 
 
@@ -168,12 +170,12 @@
 
             ;"test-run" ^{:doc "Runs unit tests. Does not build the bundle first.."}
             ;["shell" "./node_modules/karma/bin/karma" "start" "--single-run"]
-            
+
             ;"test-clj" ^{:doc "Run Unit Tests. "}
             ; ["with-profile" "+demo,+dev" "test"]
-            
+
             ;"test-js" ^{:doc "Run Unit Tests. Will compile bundle first."}
             ;["do" "build-test" ["test-run"]]
-            
+
             "bump-version" ^{:doc "Increases project.clj version number (used by CI)."}
             ["change" "version" "leiningen.release/bump-version"]})

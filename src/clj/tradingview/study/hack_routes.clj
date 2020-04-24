@@ -1,9 +1,9 @@
 (ns tradingview.study.hack-routes
   (:require
    [clojure.string :as str]
+   [cheshire.core :refer [parse-string]]
    [ring.util.response :as response]
    [ring.util.http-response :refer [ok]]
-   [compojure.core :refer [defroutes GET]]
    [compojure.api.sweet :as sweet]
    [clojure.java.io :refer [input-stream]])
   (:import [java.io File])
@@ -28,40 +28,21 @@
     data-raw))
 
 
-(def json-fn "resources/tvhack.json")
-
-(defn tradingview-status []
-  (-> json-fn
-      (slurp)
-      ;(parse-string)
-      ))
-
-
-
-
-
-(defn tvhack-routes [tv]
+(defn tvhack-api-routes [tv]
   (sweet/context "/tvhack" [] :tags ["tvhack"]
-
-    (sweet/GET "/data" []
-      :summary "gets tradingview hack data"
-      (ok {:result (tradingview-status)}))
-
     (sweet/POST "/dump" {params :params}
       (let [file-params (:content params)
             tv-params (dissoc params :content)
             {:keys [id name symbol resolution]} tv-params
-            id (or id 77)
+            id (or (when (not (nil? id)) (Integer/parseInt id)) id 77)
             name (or name "unknown")
             symbol (or symbol "unknown")
             ;resolution (or resolution "1D")
             ]
-        (println "tradingview dump received, params: " params)
-        ;(.save-template tv 77 77 {:name "test" :content (get-zip-contents file-params)})
         (println "saving tradingview chart-id " id " name: " name " symbol: " symbol)
-        (.modify-chart tv 77 77 id
-                       (assoc tv-params :content  (get-zip-contents file-params)))
-        (response/redirect "https://www.tradingview.com/savechart/bongistan")))
-
-   ;(sweet/GET "/tvdata" [] (response/response (tradingview-status)))
-    ))
+        (->> (get-zip-contents file-params)
+             (parse-string)
+             (assoc tv-params :content)
+        ;     #(dissoc % :savingToken :id)
+             (.modify-chart tv 77 77 id))
+        (response/redirect "https://www.tradingview.com/savechart/bongistan")))))

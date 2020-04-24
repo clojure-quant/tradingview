@@ -26,13 +26,29 @@
 (defn load-chart
   ([db client_id user_id] ; LIST
    (-> (mc/find-maps db "tvchart"
-                     {:client_id client_id :user_id user_id}
-                     {:_id 0 :symbol 1 :resolution 1 :id 1 :name 1 :timestamp 1 :chart_id 1})
+                     {:client_id client_id 
+                      :user_id user_id}
+                     {:_id 0 
+                      :symbol 1 
+                      :resolution 1 
+                      :id 1 
+                      :name 1 
+                      :timestamp 1 
+                      :chart_id 1})
        (patch)))
   ([db client_id user_id chart_id] ; ONE
    (-> (mc/find-maps db "tvchart"
-                     {:client_id client_id :user_id user_id :chart_id chart_id}
-                     {:_id 0 :symbol 1 :resolution 1 :id 1 :name 1 :timestamp 1 :chart_id 1 :content 1})
+                     {:client_id client_id 
+                      :user_id user_id 
+                      :chart_id chart_id}
+                     {:_id 0 
+                      :symbol 1 
+                      :resolution 1 
+                      :id 1 
+                      :name 1 
+                      :timestamp 1 
+                      :chart_id 1 
+                      :content 1})
        (patch)
        (first))))
 

@@ -12,7 +12,7 @@
    [tradingview.impl.time :refer [server-time]]
    [tradingview.middleware :refer [wrap-middleware]]
    [tradingview.study.hack-routes :refer [tvhack-api-routes]]
-   [tradingview.study.views :refer [chart-list-page chart-raw-page]]
+   [tradingview.study.views :refer [chart-list-page chart-json chart-raw-page]]
    [tradingview.study.extract :refer [chart-extract-page]]))
 
 (s/defschema Chart
@@ -132,6 +132,8 @@
      ; ui routes
     (GET "/hacked-chart-list" []
       (chart-list-page tv))
+    (GET "/hacked-chart-json" [id]
+      (response (chart-json tv id)))
     (GET "/hacked-chart-raw" [id]
       (chart-raw-page tv id))
     (GET "/hacked-chart-extract" [id]

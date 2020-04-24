@@ -145,7 +145,7 @@
             ["run" "-m" "shadow.cljs.devtools.cli" "watch" ":demo"]
 
             "build-cljs"  ^{:doc "Builds Bundle. Gets executed automatically before unit tests."}
-            ["with-profile" "+demo,+cljs" "shell" "shadow-cljs" "compile" "demo"]
+            ["with-profile" "+demo,+cljs" "run" "-m" "shadow.cljs.devtools.cli" "compile" "demo"]
 
             "demo"  ^{:doc "Runs UI components via webserver."}
             ["with-profile" "+demo,+dev,+cljs" "run" "-m" "shadow.cljs.devtools.cli" "watch" ":demo"]

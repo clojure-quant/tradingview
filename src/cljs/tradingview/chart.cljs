@@ -29,8 +29,8 @@
                  :enabled_features ['study_templates']
                  :charts_storage_url storage-url ; "https://saveload.tradingview.com",
                  :charts_storage_api_version "1.1"
-                 :client_id 1 ; "tradingview.com"
-                 :user_id 1 ; "public_user_id"
+                 :client_id 77 ; "tradingview.com"
+                 :user_id 77 ; "public_user_id"
 			           ;width: 200,
 			           ;height: 200,
                  :fullscreen false ; // all window

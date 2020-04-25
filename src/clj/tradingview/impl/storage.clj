@@ -48,7 +48,8 @@
                       :name 1 
                       :timestamp 1 
                       :chart_id 1 
-                      :content 1})
+                      :content 1
+                      :legs 1})
        (patch)
        (first))))
 

@@ -33,7 +33,7 @@
    ; MongoDB with ssh tunnel
    [com.novemberain/monger "3.5.0" :exclusions [com.google.guava/guava]]
    [clj-commons/clj-ssh "0.5.15"]  ; SSH Tunnel
-   
+
    ; Route handling
    [ring/ring-defaults "0.3.2"]
    ;  [ring/ring-codec "1.1.1"]
@@ -43,13 +43,13 @@
    [cheshire "5.8.0"]                         ; JSON encoding
    [amalloy/ring-gzip-middleware "0.1.4"]     ; gzip compress responses
    [hiccup "1.0.5"]                           ; Templating Server/Side
-   
+
    ; visualization of tradingview saved charts
    [json-html "0.4.7"]
    [clj-time "0.15.2"]] ; joda-time wrapper for clj
 
-  
-  :clean-targets ^{:protect false} ["target/classes" 
+
+  :clean-targets ^{:protect false} ["target/classes"
                                     "target/stale"
                                     ;"resources/static/cljs/"
                                     ]
@@ -63,12 +63,18 @@
                        :dependencies [; Web Server
                                       [ring "1.7.0"]
                                       [ring/ring-core "1.7.0"]
-                                     ;[ring/ring-devel "1.7.0"]
                                       [ring/ring-jetty-adapter "1.7.0"]  ; needs to match compojure version
                                       ]}
 
              :demo {:source-paths ["profiles/demo/src/clj"]
-                    :resource-paths ["profiles/demo/resources"]}
+                    :resource-paths ["profiles/demo/resources"]
+                    :repl-options {:init-ns demo.main
+                                   :init (start)}
+                    :dependencies [; Web Server
+                                   [ring "1.7.0"]
+                                   [ring/ring-core "1.7.0"]
+                                   [ring/ring-jetty-adapter "1.7.0"]  ; needs to match compojure version
+                                   ]}
 
              :cljs {:source-paths ["src/cljs"
                                    "profiles/demo/src/cljs"]

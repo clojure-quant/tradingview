@@ -1,9 +1,10 @@
 (ns tradingview.routes
   (:require
    [schema.core :as s]
+   [cheshire.core :refer [parse-string generate-string]]
    [ring.util.response :refer [response]]
    [ring.util.http-response :refer [ok]]
-   [compojure.core :refer [defroutes routes GET]]
+   [compojure.core :refer [routes GET]]
    [compojure.api.sweet :as sweet]
    [tradingview.impl.time :refer [server-time]]
    [tradingview.middleware :refer [wrap-middleware]]
@@ -24,56 +25,79 @@
   {:name String
    :content String})
 
-(defn save-chart-wrapped [tv client user name content symbol resolution]
-  (let [data {:name name
-              :content content
-              :symbol symbol
-              :resolution resolution}]
-    {:status "ok" :id (.save-chart tv client user data)}))
+(defn unpack-chart [chart-packed]
+  (let [chart (parse-string chart-packed)
+        content (parse-string (get chart "content"))
+        legs (parse-string (get chart "legs"))]
+    (merge chart {"content" content
+                  "legs" legs})))
 
-(defn modify-chart-wrapped [tv client user chart name content symbol resolution]
-  (let [data {:name name
-              :content content
-              :symbol symbol
-              :resolution resolution
-              :chart_id chart}]
-    (.modify-chart tv client user chart data)
+(defn pack-chart [chart-unpacked]
+  (let [legs (generate-string (get chart-unpacked :legs))
+        content (generate-string (get chart-unpacked :content))
+        chart (merge chart-unpacked {:content content
+                                     :legs legs})
+       _ (println "chart: " chart)]
+    ;(generate-string chart)
+chart
+))
+
+(defn save-chart-wrapped [tv client-id user-id content options]
+  (let [chart (unpack-chart content)
+        data (merge chart options)]
+    {:status "ok" :id (.save-chart tv client-id user-id data)}))
+
+(defn modify-chart-wrapped [tv client-id user-id chart-id content options]
+  (let [chart (unpack-chart content)
+        data (merge {:chart_id chart-id} options chart)]
+    (.modify-chart tv client-id user-id chart-id data)
     {:status "ok"}))
 
-(defn save-or-modify-chart [tv client user chart name content symbol resolution]
-  (if (= chart 0)
-    (save-chart-wrapped   tv client user       name content symbol resolution)
-    (modify-chart-wrapped tv client user chart name content symbol resolution)))
+(defn save-or-modify-chart [tv client-id user-id chart-id content options]
+  (if (= chart-id 0)
+    (save-chart-wrapped   tv client-id user-id          content options)
+    (modify-chart-wrapped tv client-id user-id chart-id content options)))
+
+
 
 (defn routes-storage [tv]
   (sweet/context "/tradingviewstorage" [] :tags ["storage"]
 
-        ; storage
+    ; charts
     (sweet/GET "/1.1/charts" []
-      :query-params [client :- s/Int user :- s/Int {chart :- s/Int 0}]
+      :query-params [client :- s/Int 
+                     user :- s/Int 
+                     {chart :- s/Int 0}]
       (ok (if (= chart 0)
-            {:status "ok" :data (.load-chart tv client user)}
-            {:status "ok" :data (.load-chart tv client user chart)})))
+            {:status "ok" :data (.load-charts tv client user)}
+            {:status "ok" :data (pack-chart (.load-chart tv client user chart))})))
 
     (sweet/POST "/1.1/charts" []
-      :query-params [client :- s/Int user :- s/Int {chart :- s/Int 0}]
+      :query-params [client :- s/Int
+                     user :- s/Int
+                     {chart :- s/Int 0}]
       :consumes ["application/x-www-form-urlencoded"]
-      :form-params [name content symbol resolution]
-           ;(ok {:status "ok" :id (save-chart client user chart-data)} ))
-      (ok (save-or-modify-chart tv client user chart name content symbol resolution)))
+      :form-params [content
+                    name
+                    symbol
+                    resolution]
+      (ok (save-or-modify-chart tv client user chart 
+                                content
+                                {:name name :symbol symbol :resolution resolution})))
 
     (sweet/PUT "/1.1/charts" []
-      :query-params [client :- s/Int user :- s/Int {chart s/Int}]
+      :query-params [client :- s/Int
+                     user :- s/Int
+                     {chart s/Int}]
       :body [chart-data Chart]
-      (ok (do (.modify-chart tv client user chart chart-data)
-              {:status "ok"})))
+      (ok (modify-chart-wrapped tv client user chart chart-data {})))
 
     (sweet/DELETE "/1.1/charts" []
       :query-params [client :- s/Int user :- s/Int {chart :- s/Int 0}]
       (ok (do (.delete-chart tv client user chart) {:status "ok"})))
 
 
-        ; storage
+        ; templates
 
 
     (sweet/GET "/1.1/study_templates" []

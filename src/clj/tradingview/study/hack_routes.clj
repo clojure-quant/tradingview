@@ -60,6 +60,7 @@
     (sweet/POST "/dump" {params :params}
       (let [file-params (:content params)
             tv-params (dissoc params :content)
+            _ (println "tv-params " tv-params)
             {:keys [id name symbol resolution]} tv-params
             id (or (when (not (nil? id)) (Integer/parseInt id)) id 77)
             name (or name "unknown")
@@ -69,7 +70,5 @@
         (println "saving tradingview chart-id " id " name: " name " symbol: " symbol)
         (save-or-modify-chart tv 77 77 id
                               (get-zip-contents file-params)
-                              {:name name
-                               :resolution resolution
-                               :symbol symbol})
+                              tv-params)
         (redirect "https://www.tradingview.com/savechart/bongistan")))))

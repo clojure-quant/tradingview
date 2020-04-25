@@ -1,1 +1,0 @@
-curl "http://localhost:8087/api/tradingviewstorage/1.1/charts?client=77&user=77&chart=25174627"

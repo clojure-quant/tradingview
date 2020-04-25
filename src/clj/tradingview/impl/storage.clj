@@ -49,9 +49,17 @@
                       :id 1 
                       :name 1 
                       :timestamp 1 
+                      :description 1
+                      :listed_exchange 1
+                      :exchange 1
                       :chart_id 1 
-                      :content 1
-                      :legs 1}
+                      :charts 1
+                      :legs 1
+                      :layout 1
+                      :is_realtime 1
+                      :short_name 1
+                      :publish_request_id 1
+                      :symbol_type 1}
                      true)
        (patch)
        (first)))

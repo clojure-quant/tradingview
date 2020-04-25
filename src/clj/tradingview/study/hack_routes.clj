@@ -6,7 +6,7 @@
    [compojure.core :refer [routes GET]]
    [compojure.api.sweet :as sweet]
    [clojure.java.io :refer [input-stream]]
-   [tradingview.routes :refer [unpack-chart]]
+   [tradingview.chart-storage :refer [save-or-modify-chart]]
    [tradingview.study.extract :refer [chart-extract chart-extract-page]]
    [tradingview.study.views :refer [chart-list-page hacked-chart-json-visual-page]])
   (:import [java.io File])
@@ -26,27 +26,23 @@
   [{:keys [filename size tempfile content-type]}]
   (let [_ (println "uncompressing received zip file" tempfile)
         data-raw (unzip tempfile)
-        _ (spit "/tmp/tv-dump.json" data-raw)
-        ]
+        _ (spit "/tmp/tv-dump.json" data-raw)]
     (println "unzipped " filename " size:" size)
     data-raw))
 
 (defn tvhack-ui-routes [tv]
   (routes
-    (GET "/hacked-chart-list" []
-         (chart-list-page tv))
-    (GET "/hacked-chart-json-visual" [id]
-         (hacked-chart-json-visual-page tv id))
-    (GET "/hacked-chart-extract" [id]
-         (response (chart-extract-page tv id)))))
+   (GET "/hacked-chart-list" []
+     (chart-list-page tv))
+   (GET "/hacked-chart-json-visual" [id]
+     (hacked-chart-json-visual-page tv id))
+   (GET "/hacked-chart-extract" [id]
+     (response (chart-extract-page tv id)))))
 
 (defn chart-json [tv id]
   (println "chart-json chart-id: " id)
   (let [chart (.load-chart tv 77 77 id)
-        json (:content chart)
-        ;json-str (generate-string (:content chart))
-        ;_ (println "json: " json-str)
-        ]
+        json (:content chart)]
     json))
 
 
@@ -56,11 +52,11 @@
     (sweet/GET "/json" []
       :query-params [id :- Long]
       (ok (chart-json tv id)))
-    
+
     (sweet/GET "/extract" []
       :query-params [id :- Long]
       (ok (chart-extract tv id)))
-    
+
     (sweet/POST "/dump" {params :params}
       (let [file-params (:content params)
             tv-params (dissoc params :content)
@@ -71,9 +67,9 @@
             ;resolution (or resolution "1D")
             ]
         (println "saving tradingview chart-id " id " name: " name " symbol: " symbol)
-        (->> (get-zip-contents file-params)
-             (unpack-chart)
-            ; (assoc tv-params :content)
-        ;     #(dissoc % :savingToken :id)
-             (.modify-chart tv 77 77 id))
+        (save-or-modify-chart tv 77 77 id
+                              (get-zip-contents file-params)
+                              {:name name
+                               :resolution resolution
+                               :symbol symbol})
         (redirect "https://www.tradingview.com/savechart/bongistan")))))

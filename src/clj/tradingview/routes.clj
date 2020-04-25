@@ -1,13 +1,13 @@
 (ns tradingview.routes
   (:require
    [schema.core :as s]
-   [cheshire.core :refer [parse-string generate-string]]
-   [ring.util.response :refer [response]]
+   [cheshire.core :refer [generate-string]]
    [ring.util.http-response :refer [ok]]
-   [compojure.core :refer [routes GET]]
+   [compojure.core :refer [routes]]
    [compojure.api.sweet :as sweet]
    [tradingview.impl.time :refer [server-time]]
    [tradingview.middleware :refer [wrap-middleware]]
+   [tradingview.chart-storage :refer [save-or-modify-chart modify-chart-wrapped]]
    [tradingview.study.hack-routes :refer [tvhack-api-routes tvhack-ui-routes]]))
 
 (s/defschema Chart
@@ -25,56 +25,35 @@
   {:name String
    :content String})
 
-(defn unpack-chart [content-str]
-  (let [chart (parse-string content-str true)
-        content (parse-string (:content chart))
-        legs (parse-string (:legs chart))
-        content (merge content {:legs legs})]
-    (merge chart {:content content})))
-
-(defn save-chart-wrapped [tv client-id user-id content options]
-  (let [chart (unpack-chart content)
-        data (merge chart options)]
-    {:status "ok" :id (.save-chart tv client-id user-id data)}))
-
-(defn modify-chart-wrapped [tv client-id user-id chart-id content options]
-  (let [chart (unpack-chart content)
-        data (merge {:chart_id chart-id} options chart)]
-    (.modify-chart tv client-id user-id chart-id data)
-    {:status "ok"}))
-
-(defn save-or-modify-chart [tv client-id user-id chart-id content options]
-  (if (= chart-id 0)
-    (save-chart-wrapped   tv client-id user-id          content options)
-    (modify-chart-wrapped tv client-id user-id chart-id content options)))
-
 
 (defn format-chart [data]
-  (let [data-important (select-keys data [:publish_request_id
-                                          :name
-                                          :description
-                                          :resolution
-                                          :symbol_type
-                                          :exchange
-                                          :listed_exchange
-                                          :symbol
-                                          :short_name])
-        chart (:content data)
-        legs (:legs data)
-        content (merge data-important
-                       (if legs
-                         {:content (generate-string chart)
-                          :legs legs}
-                         {:content (generate-string chart)}))]
-    ;(generate-string chart)
-    {:timestamp (:timestamp data)
-     :name (:name data)
-     :id (:id data)
-     :content (generate-string content)}))
+  (let [{:keys [charts layout legs]} data
+        content (select-keys data [:publish_request_id
+                                   :name
+                                   :description
+                                   :resolution
+                                   :symbol_type
+                                   :exchange
+                                   :listed_exchange
+                                   :symbol
+                                   :short_name
+                                   :is_realtime])
+        content (if legs
+                  (assoc content :legs (generate-string legs))
+                  content)
+        content-inner {:content (generate-string
+                                 {:layout layout
+                                  :charts charts})}
+        content (merge content content-inner)]
+     {:timestamp (:timestamp data)
+      :name (:name data)
+      :id (:id data)
+      :content (generate-string content)}))
 
 (defn load-chart [tv client user chart]
   (let [data (.load-chart tv client user chart)
-        _ (println "chart: " data)]
+        ;_ (println "chart: " data)
+        ]
     (if (nil? data)
       {:status "error" :error "chart not found"}
       {:status "ok" :data (format-chart data)})))

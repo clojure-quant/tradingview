@@ -1,0 +1,1 @@
+curl "https://saveload.tradingview.com/1.1/charts?client=77&user=77&chart=706059"

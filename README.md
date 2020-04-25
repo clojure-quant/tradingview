@@ -55,5 +55,9 @@ https://github.com/tradingview/charting_library/wiki/UDF (need to register with 
 
 https://github.com/awb99/charting-library-examples
 
-
-
+## TODO:
+- realtime data (quotes)
+- marks
+- groups
+- send charts back to tradingview 
+- auto-calculate gann fractals

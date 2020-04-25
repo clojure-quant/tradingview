@@ -26,21 +26,11 @@
    :content String})
 
 (defn unpack-chart [content-str]
-  (let [chart (parse-string content-str)
-        content (parse-string (get chart "content"))
-        legs (parse-string (get chart "legs"))]
-    (merge chart {"content" content
-                  "legs" legs})))
-
-(defn pack-chart [chart-unpacked]
-  (let [legs (generate-string (get chart-unpacked :legs))
-        content (generate-string (get chart-unpacked :content))
-        chart (merge chart-unpacked {:content content
-                                     :legs legs})
-        ;_ (println "chart: " chart)
-        ]
-    ;(generate-string chart)
-    chart))
+  (let [chart (parse-string content-str true)
+        content (parse-string (:content chart))
+        legs (parse-string (:legs chart))
+        content (merge content {:legs legs})]
+    (merge chart {:content content})))
 
 (defn save-chart-wrapped [tv client-id user-id content options]
   (let [chart (unpack-chart content)
@@ -58,9 +48,38 @@
     (save-chart-wrapped   tv client-id user-id          content options)
     (modify-chart-wrapped tv client-id user-id chart-id content options)))
 
+
+(defn format-chart [data]
+  (let [data-important (select-keys data [:publish_request_id
+                                          :name
+                                          :description
+                                          :resolution
+                                          :symbol_type
+                                          :exchange
+                                          :listed_exchange
+                                          :symbol
+                                          :short_name])
+        chart (:content data)
+        legs (:legs data)
+        content (merge data-important
+                       (if legs
+                         {:content (generate-string chart)
+                          :legs legs}
+                         {:content (generate-string chart)}))]
+    ;(generate-string chart)
+    {:timestamp (:timestamp data)
+     :name (:name data)
+     :id (:id data)
+     :content (generate-string content)}))
+
 (defn load-chart [tv client user chart]
-  (pack-chart
-   (.load-chart tv client user chart)))
+  (let [data (.load-chart tv client user chart)
+        _ (println "chart: " data)]
+    (if (nil? data)
+      {:status "error" :error "chart not found"}
+      {:status "ok" :data (format-chart data)})))
+
+
 
 (defn routes-storage [tv]
   (sweet/context "/tradingviewstorage" [] :tags ["storage"]
@@ -72,7 +91,7 @@
                      {chart :- s/Int 0}]
       (ok (if (= chart 0)
             {:status "ok" :data (.chart-list tv client user)}
-            {:status "ok" :data (load-chart tv client user chart)})))
+            (load-chart tv client user chart))))
 
     (sweet/POST "/1.1/charts" []
       :query-params [client :- s/Int

@@ -53,8 +53,8 @@
   (let [id (Integer/parseInt id)
         extracted (chart-extract tv id)
         ;s "AV:DAX_Index"
-        s "BITMEX:XBTUSD"
-        extracted (filter #(= s (:symbol %)) extracted)
+        ;s "BITMEX:XBTUSD"
+        ;extracted (filter #(= s (:symbol %)) extracted)
         ;_ (println "extracted: " extracted)
         ]
     (with-out-str (print-table [;:id

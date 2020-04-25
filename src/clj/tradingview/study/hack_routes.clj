@@ -6,7 +6,8 @@
    [compojure.core :refer [routes GET]]
    [compojure.api.sweet :as sweet]
    [clojure.java.io :refer [input-stream]]
-   [tradingview.study.extract :refer [chart-extract-page]]
+   [tradingview.routes :refer [unpack-chart]]
+   [tradingview.study.extract :refer [chart-extract chart-extract-page]]
    [tradingview.study.views :refer [chart-list-page hacked-chart-json-visual-page]])
   (:import [java.io File])
   (:import [java.util.zip GZIPInputStream]))
@@ -25,7 +26,8 @@
   [{:keys [filename size tempfile content-type]}]
   (let [_ (println "uncompressing received zip file" tempfile)
         data-raw (unzip tempfile)
-        _ (spit "/tmp/tv.json" data-raw)]
+        _ (spit "/tmp/tv-dump.json" data-raw)
+        ]
     (println "unzipped " filename " size:" size)
     data-raw))
 
@@ -37,7 +39,6 @@
          (hacked-chart-json-visual-page tv id))
     (GET "/hacked-chart-extract" [id]
          (response (chart-extract-page tv id)))))
-
 
 (defn chart-json [tv id]
   (println "chart-json chart-id: " id)
@@ -55,7 +56,11 @@
     (sweet/GET "/json" []
       :query-params [id :- Long]
       (ok (chart-json tv id)))
-
+    
+    (sweet/GET "/extract" []
+      :query-params [id :- Long]
+      (ok (chart-extract tv id)))
+    
     (sweet/POST "/dump" {params :params}
       (let [file-params (:content params)
             tv-params (dissoc params :content)
@@ -67,8 +72,8 @@
             ]
         (println "saving tradingview chart-id " id " name: " name " symbol: " symbol)
         (->> (get-zip-contents file-params)
-             (parse-string)
-             (assoc tv-params :content)
+             (unpack-chart)
+            ; (assoc tv-params :content)
         ;     #(dissoc % :savingToken :id)
              (.modify-chart tv 77 77 id))
         (redirect "https://www.tradingview.com/savechart/bongistan")))))

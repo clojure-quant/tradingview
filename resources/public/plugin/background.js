@@ -1,10 +1,10 @@
-
-
 // configuration
 
-// var url_our_server = "http://localhost:8087/tvhack/dump"
+var url_our_server = "http://localhost:8087/tvhack/dump"
+//var url_our_server = "https://tradingview.bitblockart.com/tvhack/dump"
 
- var url_our_server = "https://tradingview.bitblockart.com/tvhack/dump"
+var url_tradingview = "https://www.tradingview.com/savechart/"
+//var url_tradingview = "https://de.tradingview.com/savechart/"
 
 
 function checkRaw (req) {
@@ -65,13 +65,13 @@ function safeChart (req) {
 function reForward(req) {
   console.log("reForwarded: " + req.url);
   enableRedirect = false;
-  return { redirectUrl: "https://www.tradingview.com/savechart/"};
+  return {redirectUrl: url_tradingview};
 }
 
 
 // this forwards requests to us
 browser.webRequest.onBeforeRequest.addListener(safeChart,
-  {urls: ["https://www.tradingview.com/savechart/"]},
+  {urls: [url_tradingview]},
   ["requestBody", "blocking"]);
 
 // this is the redirect from our server, thart has to go back to tradingview

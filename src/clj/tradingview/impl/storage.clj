@@ -24,7 +24,7 @@
   (map patch-one results))
 
 
-(defn chart-list [db client_id user_id] ; LIST
+(defn chart-list [db client_id user_id]
  (-> (mc/find-maps db "tvchart"
                    {:client_id client_id
                     :user_id user_id}
@@ -38,7 +38,7 @@
      (patch)))
 
 (defn load-chart
-  [db client_id user_id chart_id] ; ONE
+  [db client_id user_id chart_id]
    (-> (mc/find-maps db "tvchart"
                      {:client_id client_id 
                       :user_id user_id 
@@ -51,7 +51,8 @@
                       :timestamp 1 
                       :chart_id 1 
                       :content 1
-                      :legs 1})
+                      :legs 1}
+                     true)
        (patch)
        (first)))
 

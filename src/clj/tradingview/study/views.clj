@@ -21,7 +21,9 @@
     [:span "  "]
     [:a.link {:href (str "/hacked-chart-json-visual?id=" (:id c))} "json-visualized"]
     [:span "  "]
-    [:a.link {:href (str "/hacked-chart-extract?id=" (:id c))} "extracted data"]]])
+    [:a.link {:href (str "/hacked-chart-extract?id=" (:id c))} "extracted data"]
+    [:span "  "]
+    [:a.link {:href (str "/tvhack/extract?id=" (:id c))} "extracted-json"]]])
 
 
 (defn chart-list-page [tv]

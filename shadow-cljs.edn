@@ -1,7 +1,7 @@
 {:lein   {:profile "+cljs,+demo"}
 
  ;shadow dev http server settings
- :dev-http {8087 {:handler demo.routes/routes
+ :dev-http {8087 {:handler demo.routes/tradingview-routes
                   :roots ["resources/public"
                           "profiles/demo/resources/public"
                           "classpath:resources"

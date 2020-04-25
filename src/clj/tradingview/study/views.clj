@@ -17,11 +17,11 @@
    [:td (:name c)]
    [:td (:symbol c)]
    [:td
-    [:a.link {:href (str "/api/tvhack/json?id=" (:id c))} "json-download"]
+    [:a.link {:href (str "/tvhack/json?id=" (:id c))} "json"]
     [:span "  "]
-    [:a.link {:href (str "/hacked-chart-raw?id=" (:id c))} "json-visualized"]
+    [:a.link {:href (str "/hacked-chart-json-visual?id=" (:id c))} "json-visualized"]
     [:span "  "]
-    [:a.link {:href (str "/hacked-chart-extract?id=" (:id c))} "download extracted data"]]])
+    [:a.link {:href (str "/hacked-chart-extract?id=" (:id c))} "extracted data"]]])
 
 
 (defn chart-list-page [tv]
@@ -44,24 +44,15 @@
        (map chart list)]])))
 
 
-(defn chart-json [tv id]
-  (println "chart-json chart-id: " id)
-  (let [chart (.load-chart tv 77 77 (Integer/parseInt id))
-        json (:content chart)
-        ;json-str (generate-string (:content chart))
-        ;_ (println "json: " json-str)
-        ]
-    json))
-
-
-(defn chart-raw-page [tv id]
-  (println "chart-raw chart-id: " id)
+(defn hacked-chart-json-visual-page [tv id]
+  (println "json-visual chart-id: " id " type: " (type id))
   (let [chart (.load-chart tv 77 77 (Integer/parseInt id))
         json-str (generate-string (:content chart))
-        _ (println "json: " json-str)]
+        ;_ (println "json: " json-str)
+        ]
     (page/html5
      [:head
-      [:title "tradingview - hacked chsrt raw"]
+      [:title "tradingview - hacked chart raw"]
       (page/include-css "json.human.css")]
      (json->html json-str))))
 

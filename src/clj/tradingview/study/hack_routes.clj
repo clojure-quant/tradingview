@@ -1,13 +1,13 @@
 (ns tradingview.study.hack-routes
   (:require
-   [clojure.string :as str]
    [cheshire.core :refer [parse-string]]
    [ring.util.response :refer [response redirect]]
    [ring.util.http-response :refer [ok]]
+   [compojure.core :refer [routes GET]]
    [compojure.api.sweet :as sweet]
    [clojure.java.io :refer [input-stream]]
-   [tradingview.study.views :refer [chart-json]]
-   )
+   [tradingview.study.extract :refer [chart-extract-page]]
+   [tradingview.study.views :refer [chart-list-page hacked-chart-json-visual-page]])
   (:import [java.io File])
   (:import [java.util.zip GZIPInputStream]))
 
@@ -29,12 +29,31 @@
     (println "unzipped " filename " size:" size)
     data-raw))
 
+(defn tvhack-ui-routes [tv]
+  (routes
+    (GET "/hacked-chart-list" []
+         (chart-list-page tv))
+    (GET "/hacked-chart-json-visual" [id]
+         (hacked-chart-json-visual-page tv id))
+    (GET "/hacked-chart-extract" [id]
+         (response (chart-extract-page tv id)))))
+
+
+(defn chart-json [tv id]
+  (println "chart-json chart-id: " id)
+  (let [chart (.load-chart tv 77 77 id)
+        json (:content chart)
+        ;json-str (generate-string (:content chart))
+        ;_ (println "json: " json-str)
+        ]
+    json))
+
 
 (defn tvhack-api-routes [tv]
   (sweet/context "/tvhack" [] :tags ["tvhack"]
 
     (sweet/GET "/json" []
-      :query-params [id :- String]
+      :query-params [id :- Long]
       (ok (chart-json tv id)))
 
     (sweet/POST "/dump" {params :params}

@@ -48,7 +48,7 @@
 
 
 (defn chart-extract-page [tv id]
-  (println "chart-raw chart-id: " id)
+  (println "chart extract chart-id: " id)
   (let [chart (.load-chart tv 77 77 (Integer/parseInt id))
         content (clojure.walk/keywordize-keys (:content chart))
         _ (println "content: " content)

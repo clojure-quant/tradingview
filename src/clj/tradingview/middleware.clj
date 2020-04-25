@@ -2,7 +2,6 @@
   (:require
    [ring.util.http-response :refer [ok]]
    [ring.middleware.defaults :refer [wrap-defaults site-defaults]]
-   ;[ring.middleware.reload :refer [wrap-reload]]
    [ring.middleware.cors :refer [wrap-cors]]
    [ring.middleware.params :refer [wrap-params]]
    [ring.middleware.multipart-params :refer [wrap-multipart-params]]
@@ -36,5 +35,4 @@
                  :access-control-allow-methods [:get :put :post :delete])
       (wrap-params)
       (wrap-multipart-params)
-      ;(wrap-reload) ;wrap reload isn't needed when the clj sources are watched by figwheel
       (wrap-gzip)))

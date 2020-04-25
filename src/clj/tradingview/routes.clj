@@ -25,8 +25,8 @@
   {:name String
    :content String})
 
-(defn unpack-chart [chart-packed]
-  (let [chart (parse-string chart-packed)
+(defn unpack-chart [content-str]
+  (let [chart (parse-string content-str)
         content (parse-string (get chart "content"))
         legs (parse-string (get chart "legs"))]
     (merge chart {"content" content
@@ -37,10 +37,10 @@
         content (generate-string (get chart-unpacked :content))
         chart (merge chart-unpacked {:content content
                                      :legs legs})
-       _ (println "chart: " chart)]
+        ;_ (println "chart: " chart)
+        ]
     ;(generate-string chart)
-chart
-))
+    chart))
 
 (defn save-chart-wrapped [tv client-id user-id content options]
   (let [chart (unpack-chart content)
@@ -58,19 +58,21 @@ chart
     (save-chart-wrapped   tv client-id user-id          content options)
     (modify-chart-wrapped tv client-id user-id chart-id content options)))
 
-
+(defn load-chart [tv client user chart]
+  (pack-chart
+   (.load-chart tv client user chart)))
 
 (defn routes-storage [tv]
   (sweet/context "/tradingviewstorage" [] :tags ["storage"]
 
     ; charts
     (sweet/GET "/1.1/charts" []
-      :query-params [client :- s/Int 
-                     user :- s/Int 
+      :query-params [client :- s/Int
+                     user :- s/Int
                      {chart :- s/Int 0}]
       (ok (if (= chart 0)
-            {:status "ok" :data (.load-charts tv client user)}
-            {:status "ok" :data (pack-chart (.load-chart tv client user chart))})))
+            {:status "ok" :data (.chart-list tv client user)}
+            {:status "ok" :data (load-chart tv client user chart)})))
 
     (sweet/POST "/1.1/charts" []
       :query-params [client :- s/Int
@@ -81,9 +83,11 @@ chart
                     name
                     symbol
                     resolution]
-      (ok (save-or-modify-chart tv client user chart 
+      (ok (save-or-modify-chart tv client user chart
                                 content
-                                {:name name :symbol symbol :resolution resolution})))
+                                {:name name
+                                 :symbol symbol
+                                 :resolution resolution})))
 
     (sweet/PUT "/1.1/charts" []
       :query-params [client :- s/Int

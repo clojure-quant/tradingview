@@ -23,20 +23,22 @@
 (defn patch [results]
   (map patch-one results))
 
+
+(defn chart-list [db client_id user_id] ; LIST
+ (-> (mc/find-maps db "tvchart"
+                   {:client_id client_id
+                    :user_id user_id}
+                   {:_id 0
+                    :symbol 1
+                    :resolution 1
+                    :id 1
+                    :name 1
+                    :timestamp 1
+                    :chart_id 1})
+     (patch)))
+
 (defn load-chart
-  ([db client_id user_id] ; LIST
-   (-> (mc/find-maps db "tvchart"
-                     {:client_id client_id 
-                      :user_id user_id}
-                     {:_id 0 
-                      :symbol 1 
-                      :resolution 1 
-                      :id 1 
-                      :name 1 
-                      :timestamp 1 
-                      :chart_id 1})
-       (patch)))
-  ([db client_id user_id chart_id] ; ONE
+  [db client_id user_id chart_id] ; ONE
    (-> (mc/find-maps db "tvchart"
                      {:client_id client_id 
                       :user_id user_id 
@@ -51,7 +53,7 @@
                       :content 1
                       :legs 1})
        (patch)
-       (first))))
+       (first)))
 
 (defn generate-id []
   (date->ui-int (t/now)))

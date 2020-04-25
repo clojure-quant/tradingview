@@ -25,7 +25,7 @@
 
 
 (defn chart-list-page [tv]
-  (let [list (.load-charts tv 77 77)]
+  (let [list (.chart-list tv 77 77)]
     (page/html5
      [:head
       [:title "tradingview - hacked charts"]

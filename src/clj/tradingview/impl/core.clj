@@ -23,7 +23,7 @@
 
     (load-series [this symbol resolution from to] (series/tradingview-series db symbol resolution from to))
 
-    (load-charts [this client user] (storage/load-chart db client user))
+    (chart-list [this client user] (storage/chart-list db client user))
     (load-chart [this client user chart-id] (storage/load-chart db client user chart-id))
     (save-chart [this client-id user-id data] (storage/save-chart db client-id user-id data))
     (modify-chart [this client-id user-id chart-id data] (storage/modify-chart db client-id user-id chart-id data))

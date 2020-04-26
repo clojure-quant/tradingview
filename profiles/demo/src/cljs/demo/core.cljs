@@ -8,6 +8,10 @@
 (def config-tradingview-demo-storage-prod {:feed-url "https://demo_feed.tradingview.com"
                                            :storage-url "https://tradingview.bitblockart.com/api/tradingviewstorage"})
 
+(def config-tradingview-demo-storage-dev {:feed-url "https://demo_feed.tradingview.com"
+                                           :storage-url "http://localhost:8087/api/tradingviewstorage"})
+
+
 (def config-tradingview-demo {:feed-url "https://demo_feed.tradingview.com"
                               :storage-url "https://saveload.tradingview.com"})
 
@@ -32,6 +36,7 @@
             "our" config-our
             "tradingview-demo" config-tradingview-demo
             "tradingview-demo-our-storage" config-tradingview-demo-storage-prod
+            "tradingview-demo-dev-storage" config-tradingview-demo-storage-dev
             config-dev))
   (println "new config:" @aconfig))
 
@@ -42,7 +47,10 @@
      [:select {:on-change #(change-config! (.. % -target -value))}
       [:option {:value :our} "our source"]
       [:option {:value :tradingview-demo} "demo"]
-      [:option {:value :tradingview-demo-our-storage} "tradingview-demo , our-storage"]]
+      [:option {:value :tradingview-demo-our-storage} "tradingview-demo , our-storage"]
+      [:option {:value :tradingview-demo-dev-storage} "tradingview-demo , dev-storage"]
+
+      ]
      [:div {:style {:width 800 :height 600}}
       [tradingview-chart @aconfig]]
      [:p (str "config: " @aconfig)]]))

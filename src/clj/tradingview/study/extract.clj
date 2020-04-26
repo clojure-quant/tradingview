@@ -43,7 +43,7 @@
 
 (defn chart-extract [tv id]
   (let [chart (.load-chart tv 77 77 id)
-        content (clojure.walk/keywordize-keys (:content chart))
+        content  chart; (clojure.walk/keywordize-keys (:content chart))
         ;_ (println "content: " content)
         ]
     (extract content)))
@@ -73,5 +73,8 @@
 
 (comment
 
-  (chart-extract demo.routes/tv 12630490))
+  (chart-extract demo.routes/tv 12630490)
+
+  ;
+  )
 
